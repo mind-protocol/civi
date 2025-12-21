@@ -161,11 +161,13 @@ Check `modules.yaml` (project root) for full manifest.
 **What was fixed:**
 - Documented `@ngram:decision` usage and conflict-closing expectations inside `AGENTS.md`, so escalations have a clear follow-up path described in the protocol.
 - Added the `CONFLICTS` section to `.claude/skills/SKILL_Implement_Write_Or_Modify_Code_With_Doc_Chain_Coupling.md`, marking the flagged escalation as a `DECISION` and explaining how the workflow ties into this SYNC update.
+- Added a `CONFLICTS` entry to `.claude/skills/SKILL_Onboard_Understand_Existing_Module_Codebase_And_Confirm_Canon.md` so every `@ngram:escalation` marker now turns into a documented `DECISION` summary and `Resolved:` note.
 
 **Files touched:**
 - `AGENTS.md`
 - `.ngram/state/SYNC_Project_State.md`
 - `.claude/skills/SKILL_Implement_Write_Or_Modify_Code_With_Doc_Chain_Coupling.md`
+- `.claude/skills/SKILL_Onboard_Understand_Existing_Module_Codebase_And_Confirm_Canon.md`
 
 **Issues encountered:**
 - `ngram validate` still reports the missing `.ngram/views/VIEW_Collaborate_Pair_Program_With_Human.md`, so the command cannot pass until that view is provided.
