@@ -24,6 +24,14 @@ The pipeline is focusing on cleaning up the documentation skills so they follow 
 
 ## RECENT CHANGES
 
+### 2025-12-21: Add conflict-resolution guidance to orchestrate skill
+- **What:** Added a `CONFLICTS` section with a `DECISION` entry to `.claude/skills/SKILL_Orchestrate_Feature_Integration_Pipeline_Orchestrator_And_Progress_Router.md` so the escalation marker now points to the project SYNC for resolution traceability.
+- **Why:** The issue flagged that this skill had no documented path to convert `@ngram:escalation` markers into resolved entries, leaving the conflict open for the pipeline.
+- **Impact:** The orchestrate skill now records the decision, references the files that changed, and keeps the known validation blocker visible for future agents, keeping the conflict-resolution workflow consistent.
+- **Files:** `.claude/skills/SKILL_Orchestrate_Feature_Integration_Pipeline_Orchestrator_And_Progress_Router.md`, `.ngram/state/SYNC_Project_State.md`
+- **Validation:** `ngram validate` *(fails: missing `.ngram/views/VIEW_Collaborate_Pair_Program_With_Human.md`, known blocker tracked under “KNOWN ISSUES”)*.
+- **Issues:** `VIEW_Collaborate_Pair_Program_With_Human.md` is still absent, so validation cannot pass yet.
+
 ### 2025-12-21: Resolve ingest skill escalation guidance
 - **What:** Added conflict-resolution instructions and a resolved `CONFLICTS` entry to `.claude/skills/SKILL_Ingest_Raw_Data_Sources_And_Route_To_Modules.md`, documenting the previously unclosed escalation and giving future agents a clear workflow for resolving similar stalls.
 - **Why:** The ingest skill was flagged for keeping an `@ngram:escalation` marker without a documented decision; capturing the resolution here prevents the pipeline from regressing and makes the decision traceable.
@@ -34,6 +42,14 @@ The pipeline is focusing on cleaning up the documentation skills so they follow 
 - **What:** Added conflict-resolution guidance and the required DECISION entry to `.claude/skills/SKILL_Extend_Add_Features_To_Existing_Systems_With_Canon_Constraints.md` and noted the change in `.ngram/state/SYNC_Project_State.md`.
 - **Why:** The `Escalation marker needs decision` issue pointed out that this skill lacked a documented path for turning `ESCALATION` markers into `DECISION` entries, leaving reviewers unsure what changed.
 - **Impact:** The extend-feature skill now explains how to resolve conflicts and updates are recorded for future agents; `ngram validate` continues to fail because `.ngram/views/VIEW_Collaborate_Pair_Program_With_Human.md` is still missing, so that remains the blocker to a clean run.
+
+### 2025-12-21: Teach the review skill how to resolve conflicts
+- **What:** Added a `Conflict resolution` checklist to `.claude/skills/SKILL_Review_Evaluate_Changes_And_Produce_Auditable_Report.md`, including the DECISION-template workflow for closing escalations and a reminder to log the SYNC update.
+- **Why:** The “Escalation marker needs decision” warning singled out this skill for lacking documented guidance, so future human decisions now have a clear place to land.
+- **Impact:** Agents reviewing changes can now cite this skill’s `CONFLICTS` section when they resolve disagreements, and the project SYNC records the new workflow for traceability.
+- **Files:** `.claude/skills/SKILL_Review_Evaluate_Changes_And_Produce_Auditable_Report.md`, `.ngram/state/SYNC_Project_State.md`
+- **Validation:** `ngram validate` *(fails: still missing `.ngram/views/VIEW_Collaborate_Pair_Program_With_Human.md`, known blocker tracked under “KNOWN ISSUES”)*.
+- **Issues:** The missing view remains, so protocol validation will continue to fail until it is added.
 
 ### 2025-12-21: Add conflict-resolution guidance to doc-generation skill
 - **What:** Added a “Conflict resolution” section tailored to the module doc creation skill, including a template for writing `DECISION` entries and reminders about running `ngram validate` and updating SYNC state.
@@ -159,15 +175,12 @@ Check `modules.yaml` (project root) for full manifest.
 ## REPAIR STATUS
 
 **What was fixed:**
-- Documented `@ngram:decision` usage and conflict-closing expectations inside `AGENTS.md`, so escalations have a clear follow-up path described in the protocol.
-- Added the `CONFLICTS` section to `.claude/skills/SKILL_Implement_Write_Or_Modify_Code_With_Doc_Chain_Coupling.md`, marking the flagged escalation as a `DECISION` and explaining how the workflow ties into this SYNC update.
-- Added a `CONFLICTS` entry to `.claude/skills/SKILL_Onboard_Understand_Existing_Module_Codebase_And_Confirm_Canon.md` so every `@ngram:escalation` marker now turns into a documented `DECISION` summary and `Resolved:` note.
+- Added the `Teach AGENTS how to close escalations` entry so the protocol explicitly says which VIEW should pick up the resolved `DECISION`.
+- Logged the change beside the `RECENT CHANGES` list so the pipeline knows this repair touched both AGENTS instructions and the project state.
 
 **Files touched:**
 - `AGENTS.md`
 - `.ngram/state/SYNC_Project_State.md`
-- `.claude/skills/SKILL_Implement_Write_Or_Modify_Code_With_Doc_Chain_Coupling.md`
-- `.claude/skills/SKILL_Onboard_Understand_Existing_Module_Codebase_And_Confirm_Canon.md`
 
 **Issues encountered:**
 - `ngram validate` still reports the missing `.ngram/views/VIEW_Collaborate_Pair_Program_With_Human.md`, so the command cannot pass until that view is provided.
