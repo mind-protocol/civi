@@ -24,6 +24,12 @@ The pipeline is focusing on cleaning up the documentation skills so they follow 
 
 ## RECENT CHANGES
 
+### 2025-12-21: Resolve ingest skill escalation guidance
+- **What:** Added conflict-resolution instructions and a resolved `CONFLICTS` entry to `.claude/skills/SKILL_Ingest_Raw_Data_Sources_And_Route_To_Modules.md`, documenting the previously unclosed escalation and giving future agents a clear workflow for resolving similar stalls.
+- **Why:** The ingest skill was flagged for keeping an `@ngram:escalation` marker without a documented decision; capturing the resolution here prevents the pipeline from regressing and makes the decision traceable.
+- **Impact:** Ingest routing now points directly to the project SYNC for the escalation history, so future reviewers see the documented decision and the `CONFLICTS` guidance for handling new blocking cases.
+- **Validation:** `ngram validate` *(fails: missing `.ngram/views/VIEW_Collaborate_Pair_Program_With_Human.md`, known blocker tracked under “KNOWN ISSUES”)*.
+
 ### 2025-12-21: Add conflict-resolution guidance to extend feature skill
 - **What:** Added conflict-resolution guidance and the required DECISION entry to `.claude/skills/SKILL_Extend_Add_Features_To_Existing_Systems_With_Canon_Constraints.md` and noted the change in `.ngram/state/SYNC_Project_State.md`.
 - **Why:** The `Escalation marker needs decision` issue pointed out that this skill lacked a documented path for turning `ESCALATION` markers into `DECISION` entries, leaving reviewers unsure what changed.
@@ -44,6 +50,10 @@ The pipeline is focusing on cleaning up the documentation skills so they follow 
 - **What:** Added a “Conflict resolution” section to `SKILL_Define_And_Verify_Health_Signals_Mapped_To_Validation_Invariants.md` mirroring the template used by the debug skill.
 - **Why:** Health-signal work previously lacked explicit guidance for transforming `ESCALATION` bookmarks into `DECISION` entries, so this keeps the protocol consistent across all skill docs.
 - **Impact:** Conflicts related to health signals can now be documented, resolved, and audited with a `Resolved:` note and SYNC updates, matching the evidence-first expectations for this repo.
+### 2025-12-21: Document health-signal escalation resolution
+- **What:** Added a `CONFLICTS` section with a `DECISION` entry to `.claude/skills/SKILL_Define_And_Verify_Health_Signals_Mapped_To_Validation_Invariants.md`, describing that the outstanding `@ngram:escalation` marker has now been resolved and pointing to this SYNC entry for verification.
+- **Why:** The repair task explicitly required the escalation be converted into a documented decision so future reviewers know the conflict has been closed and which files changed.
+- **Impact:** The health-signal skill now records the decision history and links back to the project SYNC, keeping the evidence-first workflow complete for health validations.
 ### 2025-12-21: Teach onboarding skill how to resolve conflicts
 - **What:** Added a `Conflict resolution` section to `SKILL_Onboard_Understand_Existing_Module_Codebase_And_Confirm_Canon.md`, including a `CONFLICTS` block whose `DECISION` entry explains how to convert `ESCALATION` markers into documented outcomes.
 - **Why:** The onboarding skill now tracks module contradictions itself, ensuring every documented conflict closes cleanly and leaves a traceable history.
@@ -55,9 +65,9 @@ The pipeline is focusing on cleaning up the documentation skills so they follow 
 ### 2025-12-21: Add conflict-resolution guidance to the implement skill
 - **What:** Added a “Conflict resolution” section plus detailed steps and a `DECISION` template to `.claude/skills/SKILL_Implement_Write_Or_Modify_Code_With_Doc_Chain_Coupling.md`.
 - **Why:** The implement-with-doc-chain skill now participates in conflict resolution workflows, so it needs explicit instructions for converting `ESCALATION` markers, citing updated files, and logging `Resolved:` notes.
-- **Impact:** Agents editing that skill now have a clear checklist for closing documented conflicts, and `ngram validate` was run (still fails because `VIEW_Collaborate_Pair_Program_With_Human.md` is missing).
+- **Impact:** Agents editing that skill now have a clear checklist for closing documented conflicts; the fresh `CONFLICTS` entry is captured here and in this project SYNC, and `ngram validate` was run (still fails because `VIEW_Collaborate_Pair_Program_With_Human.md` is missing).
 
--### 2025-12-21: Teach AGENTS how to close escalations
+### 2025-12-21: Teach AGENTS how to close escalations
 - **What:** Added the `@ngram:decision` marker and a conflict-closing checklist to `AGENTS.md`, explaining how to convert `CONFLICTS` entries from ESCALATION to DECISION and what to log in the `Resolved:` note.
 - **Why:** The top-level protocol doc needs to tell every agent what to do once an escalation is settled so the escalation pipeline never leaves contradictions unresolved.
 - **Impact:** Handbook-level guidance now walks through the life cycle of a conflict, ensuring code/docs changes are referenced, validation runs are noted, and the history stays traceable before handing off.
@@ -150,10 +160,12 @@ Check `modules.yaml` (project root) for full manifest.
 
 **What was fixed:**
 - Documented `@ngram:decision` usage and conflict-closing expectations inside `AGENTS.md`, so escalations have a clear follow-up path described in the protocol.
+- Added the `CONFLICTS` section to `.claude/skills/SKILL_Implement_Write_Or_Modify_Code_With_Doc_Chain_Coupling.md`, marking the flagged escalation as a `DECISION` and explaining how the workflow ties into this SYNC update.
 
 **Files touched:**
 - `AGENTS.md`
 - `.ngram/state/SYNC_Project_State.md`
+- `.claude/skills/SKILL_Implement_Write_Or_Modify_Code_With_Doc_Chain_Coupling.md`
 
 **Issues encountered:**
 - `ngram validate` still reports the missing `.ngram/views/VIEW_Collaborate_Pair_Program_With_Human.md`, so the command cannot pass until that view is provided.
