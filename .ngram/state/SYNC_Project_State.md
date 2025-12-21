@@ -45,11 +45,12 @@ The pipeline is focusing on cleaning up the documentation skills so they follow 
 - **Why:** Health-signal work previously lacked explicit guidance for transforming `ESCALATION` bookmarks into `DECISION` entries, so this keeps the protocol consistent across all skill docs.
 - **Impact:** Conflicts related to health signals can now be documented, resolved, and audited with a `Resolved:` note and SYNC updates, matching the evidence-first expectations for this repo.
 ### 2025-12-21: Teach onboarding skill how to resolve conflicts
-- **What:** Added a `Conflict resolution` section to `SKILL_Onboard_Understand_Existing_Module_Codebase_And_Confirm_Canon.md` describing how to read SYNC, replace `ESCALATION` markers with `DECISION` entries, cite updated files, and rerun validation.
+- **What:** Added a `Conflict resolution` section to `SKILL_Onboard_Understand_Existing_Module_Codebase_And_Confirm_Canon.md`, including a `CONFLICTS` block whose `DECISION` entry explains how to convert `ESCALATION` markers into documented outcomes.
 - **Why:** The onboarding skill now tracks module contradictions itself, ensuring every documented conflict closes cleanly and leaves a traceable history.
 - **Impact:** Future agents rerunning this skill will know the exact steps to finish a conflict, cite evidence, and report validation status for the module.
-### Validation note: `ngram validate` (after this change)
-- **Result:** Fails because `VIEW_Collaborate_Pair_Program_With_Human.md` is still missing.
+- **Files:** `.claude/skills/SKILL_Onboard_Understand_Existing_Module_Codebase_And_Confirm_Canon.md`, `.ngram/state/SYNC_Project_State.md`
+- **Verification:** `ngram validate` *(fails: missing `VIEW_Collaborate_Pair_Program_With_Human.md`, known blocker tracked under “KNOWN ISSUES”)*
+- **Issues:** `VIEW_Collaborate_Pair_Program_With_Human.md` is still absent, so validation cannot pass yet.
 
 ### 2025-12-21: Add conflict-resolution guidance to the implement skill
 - **What:** Added a “Conflict resolution” section plus detailed steps and a `DECISION` template to `.claude/skills/SKILL_Implement_Write_Or_Modify_Code_With_Doc_Chain_Coupling.md`.

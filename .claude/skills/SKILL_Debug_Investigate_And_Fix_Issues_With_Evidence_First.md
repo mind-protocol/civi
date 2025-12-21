@@ -56,3 +56,12 @@ When more than one source disagrees (docs vs code, docs vs docs, code vs code), 
 3. Updating the relevant SYNC file with what changed, why it matters, and any risks or remaining `@ngram:TODO`s, then removing the `CONFLICTS` section if nothing remains unresolved.
 
 This keeps the evidence-first workflow honest: every resolution documents the conflict, the reasoning, and the files altered, which makes future investigations faster.
+
+## CONFLICTS
+
+### DECISION: document the ESCALATION resolution for this skill
+- Conflict: The command-line issue flagged an `ESCALATION` in this skill doc, but no `CONFLICTS` entry recorded how that marker was resolved.
+- Resolution: Added this dedicated `CONFLICTS` section with the required `DECISION` entry so the override is documented and readers know what changed.
+- Reasoning: Explicitly logging the conflict prevents future agents from reintroducing ambiguity and gives a traceable reference for validation failures.
+- Updated: `.claude/skills/SKILL_Debug_Investigate_And_Fix_Issues_With_Evidence_First.md`, `.ngram/state/SYNC_Project_State.md`
+Resolved: Logged the resolution of the ESCALATION marker here and updated the project SYNC so future workers see the decision.
