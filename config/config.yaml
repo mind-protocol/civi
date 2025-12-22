@@ -1,0 +1,18 @@
+ingest:
+  coalesce_rules:
+    - event_type: UNIT_KILL_MINOR
+      min_count: 3
+decision_engine:
+  max_speech_budget: 2
+  budget_window: 10
+  cooldown_turns: 2
+  min_delta_value: 1.0
+  diversity_block: true
+moment_graph:
+  create_threshold: 1.0
+  merge_window: 3
+  overlap_threshold: 0.5
+  promote_threshold: 5.0
+  decay_per_turn: 0.1
+  decay_floor: 0.0
+  callback_time_gate: 15

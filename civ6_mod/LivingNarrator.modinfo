@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Mod id="living-narrator-event-exporter" version="1.0.0">
+    <Properties>
+        <Name>Living Narrator - Event Exporter</Name>
+        <Teaser>Exports game events for external AI narration</Teaser>
+        <Description>
+            Captures Civilization VI game events (turns, cities, wonders, wars, etc.)
+            and full game state for consumption by an external AI narrator system.
+
+            Files written to Documents/Civ6Narrator/:
+            - events.jsonl (append-only event stream)
+            - game_state.json (full state, updated each turn)
+        </Description>
+        <Authors>Living Narrator Project</Authors>
+        <CompatibleVersions>2.0</CompatibleVersions>
+    </Properties>
+    <Components>
+        <GameplayScripts id="LivingNarratorScripts">
+            <Properties>
+                <LoadOrder>100</LoadOrder>
+            </Properties>
+            <Items>
+                <File>Scripts/JSONSerializer.lua</File>
+                <File>Scripts/FileWriter.lua</File>
+                <File>Scripts/LivingNarrator.lua</File>
+            </Items>
+        </GameplayScripts>
+    </Components>
+</Mod>

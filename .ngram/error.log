@@ -1,0 +1,48 @@
+2025-12-22 20:45:06,927 [INFO] Starting Civ6 Living Narrator V1 (LLM + ElevenLabs)...
+2025-12-22 20:45:06,927 [INFO] Monitoring events.jsonl...
+2025-12-22 20:45:13,452 [INFO] Starting Civ6 Living Narrator V1 (LLM + ElevenLabs)...
+2025-12-22 20:45:13,452 [INFO] Monitoring events.jsonl...
+2025-12-22 20:45:13,453 [INFO] Processing Event: WONDER_COMPLETED
+2025-12-22 20:45:13,453 [INFO] Selected Candidate: wonder_completed_narrator
+2025-12-22 20:45:13,453 [INFO] Calling Gemini CLI for agent in agents/narrator (model=gemini-3-pro-preview, continue=True)
+2025-12-22 20:45:15,956 [ERROR] Gemini CLI failed: Unknown argument: continue
+Usage: gemini [options] [command]
+
+Gemini CLI - Launch an interactive CLI, use -p/--prompt for non-interactive mode
+
+Commands:
+  gemini [query..]             Launch Gemini CLI  [default]
+  gemini mcp                   Manage MCP servers
+  gemini extensions <command>  Manage Gemini CLI extensions.  [aliases: extension]
+
+Positionals:
+  query  Positional prompt. Defaults to one-shot; use -i/--prompt-interactive for interactive.
+
+Options:
+  -d, --debug                     Run in debug mode?  [boolean] [default: false]
+  -m, --model                     Model  [string]
+  -p, --prompt                    Prompt. Appended to input on stdin (if any).  [deprecated: Use the positional prompt instead. This flag will be removed in a future version.] [string]
+  -i, --prompt-interactive        Execute the provided prompt and continue in interactive mode  [string]
+  -s, --sandbox                   Run in sandbox?  [boolean]
+  -y, --yolo                      Automatically accept all actions (aka YOLO mode, see https://www.youtube.com/watch?v=xvFZjo5PgG0 for more details)?  [boolean] [default: false]
+      --approval-mode             Set the approval mode: default (prompt for approval), auto_edit (auto-approve edit tools), yolo (auto-approve all tools)  [string] [choices: "default", "auto_edit", "yolo"]
+      --experimental-acp          Starts the agent in ACP mode  [boolean]
+      --allowed-mcp-server-names  Allowed MCP server names  [array]
+      --allowed-tools             Tools that are allowed to run without confirmation  [array]
+  -e, --extensions                A list of extensions to use. If not provided, all extensions are used.  [array]
+  -l, --list-extensions           List all available extensions and exit.  [boolean]
+  -r, --resume                    Resume a previous session. Use "latest" for most recent or index number (e.g. --resume 5)  [string]
+      --list-sessions             List available sessions for the current project and exit.  [boolean]
+      --delete-session            Delete a session by index number (use --list-sessions to see available sessions).  [string]
+      --include-directories       Additional directories to include in the workspace (comma-separated or multiple --include-directories)  [array]
+      --screen-reader             Enable screen reader mode for accessibility.  [boolean]
+  -o, --output-format             The format of the CLI output.  [string] [choices: "text", "json", "stream-json"]
+  -v, --version                   Show version number  [boolean]
+  -h, --help                      Show help  [boolean]
+
+2025-12-22 20:45:15,957 [INFO] Retrying without --continue...
+2025-12-22 20:45:15,957 [INFO] Calling Gemini CLI for agent in agents/narrator (model=gemini-3-pro-preview, continue=False)
+2025-12-22 20:45:50,477 [INFO] LLM: Les Pyramides s'élèvent enfin, prouvant qu'avec assez de dos brisés, on peut transformer un tas de cailloux en un monument à la vanité éternelle.
+2025-12-22 20:45:54,611 [INFO] Audio saved to audio_output/audio_1766432750.mp3
+2025-12-22 20:45:54,612 [INFO] Audio generated: audio_output/audio_1766432750.mp3
+2025-12-22 20:45:54,613 [INFO] Enqueued audio: audio_output/audio_1766432750.mp3

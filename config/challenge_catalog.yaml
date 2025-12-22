@@ -1,0 +1,9 @@
+challenges:
+  - id: expansion_push
+    title: Expand your reach
+    conditions: Build 2 new cities before turn 50.
+    refusal_line: Another time, then.
+  - id: naval_focus
+    title: Master the waves
+    conditions: Build 3 naval units this era.
+    refusal_line: The sea will wait.

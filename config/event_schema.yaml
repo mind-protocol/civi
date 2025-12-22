@@ -1,0 +1,15 @@
+required_fields:
+  - event_type
+  - turn
+optional_fields:
+  - timestamp
+  - session_id
+  - payload
+  - type
+  - Turn
+  - time
+field_aliases:
+  type: event_type
+  Turn: turn
+  time: timestamp
+reject_unknown: false

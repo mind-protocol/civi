@@ -1,0 +1,40 @@
+"""Deprecated placeholder. Use audio_queue_player.py."""
+
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+from typing import List, Optional
+
+
+@dataclass
+class AudioItem:
+    path: str
+    voice: Optional[str] = None
+
+
+@dataclass
+class AudioQueue:
+    queue: List[AudioItem] = field(default_factory=list)
+    current: Optional[AudioItem] = None
+
+    def enqueue(self, item: AudioItem) -> None:
+        self.queue.append(item)
+
+    def next_item(self) -> Optional[AudioItem]:
+        if self.current is not None:
+            return None
+        if not self.queue:
+            return None
+        self.current = self.queue.pop(0)
+        return self.current
+
+    def stop(self) -> None:
+        self.current = None
+        self.queue.clear()
+
+    def replay(self) -> Optional[AudioItem]:
+        if self.current is None:
+            return None
+        self.queue.insert(0, self.current)
+        self.current = None
+        return self.queue[0]

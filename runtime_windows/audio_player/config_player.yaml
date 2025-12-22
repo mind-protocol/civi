@@ -1,0 +1,5 @@
+queue:
+  max_depth: 5
+playback:
+  device: default
+  volume: 1.0

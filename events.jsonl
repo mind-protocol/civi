@@ -1,0 +1,13 @@
+{"event_type": "TURN_START", "turn": 1, "timestamp": 1000}
+{"event_type": "UNIT_MOVE", "turn": 1, "unit": "scout"}
+{"event_type": "CITY_BUILT", "turn": 1, "city": "Capital"}
+{"event_type": "TURN_START", "turn": 2, "timestamp": 2000}
+{"event_type": "CITY_BUILT", "turn": 2, "city": "Second City"}
+{"event_type": "WONDER_COMPLETED", "turn": 10, "wonder": "Pyramids"}
+{"event_type": "CITY_BUILT", "turn": 11, "city": "Third City"}
+{"event_type": "TURN_START", "turn": 12, "timestamp": 12000}
+{"event_type": "TURN_START", "turn": 13, "timestamp": 13000}
+{"event_type": "TURN_START", "turn": 14, "timestamp": 14000}
+{"event_type": "TURN_START", "turn": 15, "timestamp": 15000}
+{"event_type": "WONDER_COMPLETED", "turn": 16, "wonder": "Stonehenge"}
+{"event_type": "WONDER_COMPLETED", "turn": 17, "wonder": "Pyramids"}

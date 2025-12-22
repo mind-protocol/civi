@@ -1,0 +1,20 @@
+# ngram agent working directories
+.ngram/agents/repair/
+.ngram/traces/
+
+# Local env
+.env
+.venv
+venv/
+__pycache__/
+*.pyc
+
+# Runtime artifacts
+audio_output/
+narrator/state/
+.tail_state.json
+
+# System
+.DS_Store
+.vscode/
+.idea/
