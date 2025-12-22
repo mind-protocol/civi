@@ -25,17 +25,17 @@ class LLMCLIClient:
         return self._call_claude(prompt, use_continue=True)
 
     def _call_gemini(self, prompt: str, use_continue: bool) -> Dict[str, Any]:
-        """Call Gemini CLI, retry without --continue on failure."""
-        continue_flag = "--continue" if use_continue else ""
-        # Assuming Gemini CLI accepts -y for yes/confirm and -p for prompt
-        full_command = f'cd {self.agent_path} && gemini -p "{prompt}" {continue_flag} -y'
+        """Call Gemini CLI, retry without --resume on failure."""
+        cmd = ["gemini", prompt, "--yolo"]
+        if use_continue:
+            cmd.extend(["--resume", "latest"])
 
         logger.info(f"Calling Gemini CLI for agent in {self.agent_path} (model={self.model}, continue={use_continue})")
 
         try:
             result = subprocess.run(
-                full_command,
-                shell=True,
+                cmd,
+                cwd=self.agent_path,
                 capture_output=True,
                 text=True,
                 check=True
@@ -57,7 +57,7 @@ class LLMCLIClient:
             
             # Retry logic
             if use_continue:
-                logger.info("Retrying without --continue...")
+                logger.info("Retrying without --resume...")
                 return self._call_gemini(prompt, use_continue=False)
             
             return {
@@ -69,7 +69,7 @@ class LLMCLIClient:
         except subprocess.CalledProcessError as e:
             logger.error(f"Gemini CLI failed: {e.stderr}")
             if use_continue:
-                logger.info("Retrying without --continue...")
+                logger.info("Retrying without --resume...")
                 return self._call_gemini(prompt, use_continue=False)
             return {
                 "text": "Le silence tombe sur le royaume.",
@@ -79,7 +79,7 @@ class LLMCLIClient:
         except Exception as e:
             logger.error(f"Unexpected error calling Gemini: {e}")
             if use_continue:
-                logger.info("Retrying without --continue...")
+                logger.info("Retrying without --resume...")
                 return self._call_gemini(prompt, use_continue=False)
             return {
                 "text": "Une erreur ancienne s'est produite.",

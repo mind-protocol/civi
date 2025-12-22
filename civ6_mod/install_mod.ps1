@@ -1,19 +1,23 @@
 # install_mod.ps1 - Copie le mod dans le dossier Civ 6
 # Exécuter depuis le dossier civ6_mod/
 
+# UTF-8 propre (évite le "trouvÃ©")
+[Console]::OutputEncoding = [System.Text.UTF8Encoding]::new()
+
 $ModName = "LivingNarrator"
 $SourceDir = $PSScriptRoot
-$CivModsDir = "$env:USERPROFILE\Documents\My Games\Sid Meier's Civilization VI\Mods"
-$DestDir = "$CivModsDir\$ModName"
-$OutputDir = "$env:USERPROFILE\Documents\Civ6Narrator"
+
+$DocsDir = [Environment]::GetFolderPath('MyDocuments')
+$Civ6ModsDir = Join-Path $DocsDir "My Games\Sid Meier's Civilization VI\Mods"
+$DestDir = "$Civ6ModsDir\$ModName"
+$OutputDir = Join-Path $DocsDir "Civ6Narrator"
 
 Write-Host "=== Living Narrator - Installation ===" -ForegroundColor Cyan
 Write-Host ""
 
 # Vérifier que le dossier Civ 6 existe
-if (-not (Test-Path $CivModsDir)) {
-    Write-Host "ERREUR: Dossier Civ 6 Mods non trouvé!" -ForegroundColor Red
-    Write-Host "Attendu: $CivModsDir"
+if (-not (Test-Path $Civ6ModsDir)) {
+    Write-Error "ERREUR: Dossier Civ 6 Mods non trouvé!`nAttendu: $Civ6ModsDir"
     exit 1
 }
 

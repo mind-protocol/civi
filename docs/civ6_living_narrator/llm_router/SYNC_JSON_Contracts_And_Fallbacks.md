@@ -14,6 +14,7 @@ STATUS: DESIGNING
 - Strict JSON output validation with one repair pass.
 - Fallback to silence on invalid output.
 - Basic multi-model CLI support (Claude/Gemini via env var).
+- Robust session resumption (auto-fallback to fresh session if resume fails).
 
 **What's still being designed:**
 - Context pack truncation strategy.
@@ -46,10 +47,10 @@ LLM router now supports both Claude and Gemini CLIs via environment variable con
 
 ### 2025-12-22: Implement Gemini CLI Support
 
-- **What:** Refactored `simple_llm_client.py` to `LLMCLIClient`. Added support for Gemini CLI using `SELECTED_MODEL` from `.env`.
-- **Why:** Enable use of Gemini models.
+- **What:** Refactored `simple_llm_client.py` to `LLMCLIClient`. Added support for Gemini CLI using `SELECTED_MODEL` from `.env`. Verified using `--resume latest` and `--yolo` flags.
+- **Why:** Enable use of Gemini models with proper session management and auto-approval.
 - **Files:** `src/llm_router/simple_llm_client.py`, `src/main.py`
-- **Impact:** User can switch models via `.env`.
+- **Impact:** User can switch models via `.env`. Gemini sessions now persist via `--resume latest`.
 
 ### 2025-12-21: Seed llm_router docs
 
