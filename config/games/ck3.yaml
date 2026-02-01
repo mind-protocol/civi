@@ -1,0 +1,104 @@
+# Game Profile: Crusader Kings 3
+# Used by Living Narrator daemon
+
+game:
+  id: "ck3"
+  name: "Crusader Kings III"
+
+# Narrator persona file (relative to narrator/)
+narrator:
+  persona_file: "CLAUDE_CK3.md"
+  role: "Chroniqueur de cour et confident de dynastie"
+
+# Input sources
+input:
+  # No Lua mod for CK3 - pure visual/discussion mode
+  lua_log: false
+
+  # Visual mode is PRIMARY for CK3
+  visual: true
+  visual_primary: true  # Screenshots are main input, not events
+  screenshot_interval: 30  # More frequent for CK3 (slower paced, more detail)
+
+  # Voice transcripts
+  voice: true
+
+# No event-based urgency for CK3 (pure visual analysis)
+urgent_events: []
+
+# Concepts for CK3 (helps narrator focus on what to look for)
+concepts:
+  primary:
+    - characters
+    - dynasties
+    - traits
+    - succession
+    - claims
+    - titles
+  intrigue:
+    - schemes
+    - secrets
+    - hooks
+    - murder
+    - factions
+  social:
+    - marriages
+    - alliances
+    - vassals
+    - opinion
+    - prestige
+    - piety
+  warfare:
+    - wars
+    - claims
+    - holy_wars
+    - crusades
+    - levies
+    - men_at_arms
+
+# CK3-specific state files
+state_files:
+  - history.json      # Narration history
+  - dynasty.json      # Key dynasty moments
+  - characters.json   # Important NPCs and rivals
+  - threads.json      # Narrative arcs (rivalries, succession crises)
+
+# Player config template for CK3
+player_template:
+  fields:
+    - name          # Real name (e.g., "Nico")
+    - dynasty       # Dynasty name (e.g., "Valois")
+    - character     # Current character name (e.g., "Duc Philippe")
+    - realm         # Primary title (e.g., "Kingdom of France")
+
+# Visual analysis hints - what to look for in screenshots
+visual_hints:
+  character_screen:
+    - traits (icons below portrait)
+    - stress level (bars)
+    - health/age
+    - titles list
+    - claims
+    - dynasty crest
+
+  map_view:
+    - realm borders (color)
+    - war indicators (flames)
+    - army positions
+    - siege indicators
+    - holy sites
+
+  intrigue_screen:
+    - active schemes
+    - scheme power %
+    - target info
+
+  succession_screen:
+    - heir list
+    - title distribution
+    - succession type
+
+  court_screen:
+    - council members
+    - vassal opinions (colored)
+    - faction indicators

@@ -1,0 +1,4 @@
+﻿l_english:
+ ln_test_log_decision:0 "Test Living Narrator Log"
+ ln_test_log_decision_desc:0 "Click to test if the Living Narrator logging system works.\n\nThis will write to debug.log."
+ ln_test_log_decision_effect_tooltip:0 "A test event has been logged."

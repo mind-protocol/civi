@@ -1,0 +1,36 @@
+{
+  "character": {
+    "name": "Jesus Botaniate",
+    "age": 30,
+    "birth_year": 1036,
+    "dynasty": "Botaniate",
+    "motto": "Manemus"
+  },
+  "stats": {
+    "diplomacy": 18,
+    "martial": 7,
+    "stewardship": 12,
+    "intrigue": 0,
+    "learning": 17,
+    "prowess": 8
+  },
+  "traits": {
+    "personality": ["compassionate", "just", "brave", "forgiving"],
+    "education": "diplomacy_3",
+    "physical": []
+  },
+  "game_state": {
+    "year": 1066,
+    "month": "September",
+    "day": 15,
+    "location": "Byzantion",
+    "type": "landless_adventurer",
+    "band": "Lions de l'Assignation",
+    "lifestyle_focus": "voyage"
+  },
+  "significant_relationships": [],
+  "current_tensions": [],
+  "values_tested": [],
+  "last_major_event": "Game started",
+  "chronicle_summary": "Jesus Botaniate, 30 years old, arrives at the gates of Constantinople as a wandering scholar. The ministry begins."
+}

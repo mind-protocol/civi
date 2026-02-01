@@ -50,5 +50,18 @@ def read_new_lines(path: str, state: TailState) -> Tuple[List[str], TailState]:
 
     data = state.buffer + chunk
     lines, buffer = _split_lines(data)
+    
+    # Filter for [LN_EVENT] tag if present
+    extracted_lines = []
+    for line in lines:
+        if "[LN_EVENT]" in line:
+            # Extract everything after the tag
+            _, content = line.split("[LN_EVENT]", 1)
+            if content.strip():
+                extracted_lines.append(content.strip())
+        elif line.strip().startswith("{") and line.strip().endswith("}"):
+            # Also accept plain JSON lines (for backward compatibility or direct file mode)
+            extracted_lines.append(line.strip())
+            
     new_state = TailState(offset=size, buffer=buffer, mtime_ns=stat.st_mtime_ns)
-    return lines, new_state
+    return extracted_lines, new_state

@@ -1,557 +1,484 @@
--- DOCS: docs/civ6_living_narrator/lua_mod/IMPLEMENTATION_Mod_Files_And_Hooks.md
--- LivingNarrator.lua - Main event handler for Civ 6 Living Narrator
---
--- Captures game events and exports them as JSONL for external AI narration.
--- Events are written to: Documents/Civ6LivingNarrator/events/events.jsonl
+-- LivingNarrator.lua - SINGLE FILE VERSION v2.5
+-- All-in-one: JSON + FileWriter + Events
+-- No dependencies, no include(), no ExposedMembers
 
--- Include dependencies (loaded via modinfo)
-include("JSONSerializer")
-include("FileWriter")
+print("========================================")
+print("[LivingNarrator] Loading v2.5...")
+print("========================================")
 
 -- ============================================================================
--- CONFIGURATION
+-- JSON SERIALIZER (inline)
 -- ============================================================================
 
-local CONFIG = {
-    -- Enable/disable specific event categories
-    EVENTS = {
-        TURNS = true,
-        CITIES = true,
-        WONDERS = true,
-        DIPLOMACY = true,
-        COMBAT = true,
-        RESEARCH = true,
-        GREAT_PEOPLE = true,
-        RELIGION = true,
-        TRADE = true,
-    },
-    -- Debug mode
-    DEBUG = false,
-    -- Version
-    VERSION = "1.0.0",
-}
+local function EscapeString(s)
+    if s == nil then return "" end
+    s = tostring(s)
+    s = s:gsub('\\', '\\\\')
+    s = s:gsub('"', '\\"')
+    s = s:gsub('\n', '\\n')
+    s = s:gsub('\r', '\\r')
+    s = s:gsub('\t', '\\t')
+    return s
+end
+
+local function IsArray(t)
+    if type(t) ~= "table" then return false end
+    local count = 0
+    for k, v in pairs(t) do
+        if type(k) ~= "number" or k <= 0 or math.floor(k) ~= k then
+            return false
+        end
+        count = count + 1
+    end
+    for i = 1, count do
+        if t[i] == nil then return false end
+    end
+    return true
+end
+
+local SerializeValue
+SerializeValue = function(value)
+    local t = type(value)
+    if t == "nil" then
+        return "null"
+    elseif t == "boolean" then
+        return value and "true" or "false"
+    elseif t == "number" then
+        if value ~= value then return "null" end
+        if value == math.huge or value == -math.huge then return "null" end
+        if math.floor(value) == value then
+            return string.format("%d", value)
+        else
+            return string.format("%.6g", value)
+        end
+    elseif t == "string" then
+        return '"' .. EscapeString(value) .. '"'
+    elseif t == "table" then
+        local parts = {}
+        if IsArray(value) then
+            for i, v in ipairs(value) do
+                parts[i] = SerializeValue(v)
+            end
+            return "[" .. table.concat(parts, ",") .. "]"
+        else
+            local keys = {}
+            for k in pairs(value) do
+                if type(k) == "string" then
+                    table.insert(keys, k)
+                end
+            end
+            table.sort(keys)
+            for _, k in ipairs(keys) do
+                table.insert(parts, '"' .. EscapeString(k) .. '":' .. SerializeValue(value[k]))
+            end
+            return "{" .. table.concat(parts, ",") .. "}"
+        end
+    else
+        return "null"
+    end
+end
+
+local function SerializeToJSON(obj)
+    local ok, result = pcall(function() return SerializeValue(obj) end)
+    if ok then return result else return '{"error":"serialize_failed"}' end
+end
+
+print("[LivingNarrator] JSON OK")
 
 -- ============================================================================
--- STATE
+-- FILE WRITER (Print Mode - outputs to Lua.log)
 -- ============================================================================
 
-local g_CurrentTurn = 0
-local g_GameID = nil
-local g_LocalPlayerID = nil
-local g_EventCount = 0
+local g_Initialized = false
+local g_WriteCount = 0
+
+local function InitializeFiles()
+    if g_Initialized then return true end
+    g_Initialized = true
+    print("[LivingNarrator] Event logging initialized (Print Mode)")
+    return true
+end
+
+local function AppendEvent(eventData)
+    if not g_Initialized then
+        if not InitializeFiles() then return false end
+    end
+    local json = SerializeToJSON(eventData)
+    print("[LN_EVENT]" .. json)
+    g_WriteCount = g_WriteCount + 1
+    return true
+end
+
+print("[LivingNarrator] FileWriter OK")
 
 -- ============================================================================
 -- HELPERS
 -- ============================================================================
 
--- Generate a unique game session ID
-local function GenerateGameID()
-    return string.format("game_%d_%d", os.time(), math.random(1000, 9999))
-end
+local g_GameID = "game_" .. os.time()
+local g_Turn = 0
 
--- Get map dimensions
-local function GetMapSize()
-    local mapWidth, mapHeight = Map.GetGridSize()
-    return mapWidth, mapHeight
-end
-
--- Get civilization name for a player
 local function GetCivName(playerID)
-    if playerID == nil or playerID < 0 then
-        return "Unknown"
-    end
-
-    local pPlayerConfig = PlayerConfigurations[playerID]
-    if pPlayerConfig then
-        local civName = pPlayerConfig:GetCivilizationShortDescription()
-        if civName then
-            return Locale.Lookup(civName)
+    if playerID == nil or playerID < 0 then return "Unknown" end
+    local ok, result = pcall(function()
+        local cfg = PlayerConfigurations[playerID]
+        if cfg then
+            local name = cfg:GetCivilizationShortDescription()
+            if name then return Locale.Lookup(name) end
         end
-    end
-    return "Player " .. tostring(playerID)
+        return "Player" .. playerID
+    end)
+    return ok and result or "Player" .. playerID
 end
 
--- Get leader name for a player
 local function GetLeaderName(playerID)
-    if playerID == nil or playerID < 0 then
-        return "Unknown"
-    end
-
-    local pPlayerConfig = PlayerConfigurations[playerID]
-    if pPlayerConfig then
-        local leaderName = pPlayerConfig:GetLeaderName()
-        if leaderName then
-            return Locale.Lookup(leaderName)
+    if playerID == nil or playerID < 0 then return "Unknown" end
+    local ok, result = pcall(function()
+        local cfg = PlayerConfigurations[playerID]
+        if cfg then
+            local name = cfg:GetLeaderName()
+            if name then return Locale.Lookup(name) end
         end
-    end
-    return "Leader " .. tostring(playerID)
+        return "Leader" .. playerID
+    end)
+    return ok and result or "Leader" .. playerID
 end
 
--- Get city name by ID
-local function GetCityName(playerID, cityID)
-    local pPlayer = Players[playerID]
-    if pPlayer then
-        local pCities = pPlayer:GetCities()
-        if pCities then
-            local pCity = pCities:FindID(cityID)
-            if pCity then
-                return pCity:GetName()
-            end
-        end
-    end
-    return "Unknown City"
-end
-
--- Check if player is human
 local function IsHumanPlayer(playerID)
-    local pPlayerConfig = PlayerConfigurations[playerID]
-    if pPlayerConfig then
-        return pPlayerConfig:IsHuman()
-    end
-    return false
-end
-
--- ============================================================================
--- STATE COLLECTOR
--- ============================================================================
-
--- Collect unit data for a player
-local function CollectUnits(pPlayer)
-    local units = {}
-    local pUnits = pPlayer:GetUnits()
-    if pUnits then
-        for i, pUnit in pUnits:Members() do
-            local unitInfo = GameInfo.Units[pUnit:GetType()]
-            table.insert(units, {
-                id = pUnit:GetID(),
-                type = unitInfo and Locale.Lookup(unitInfo.Name) or "Unknown",
-                x = pUnit:GetX(),
-                y = pUnit:GetY(),
-                hp = pUnit:GetDamage() and (100 - pUnit:GetDamage()) or 100,
-                max_hp = 100,
-                movement = pUnit:GetMovesRemaining(),
-            })
+    if playerID == nil or playerID < 0 then return false end
+    local ok, result = pcall(function()
+        local cfg = PlayerConfigurations[playerID]
+        if cfg and cfg.IsHuman then
+            return cfg:IsHuman()
         end
-    end
-    return units
+        return false
+    end)
+    return ok and result or false
 end
-
--- Collect city data for a player
-local function CollectCities(pPlayer)
-    local cities = {}
-    local pCities = pPlayer:GetCities()
-    if pCities then
-        for i, pCity in pCities:Members() do
-            local cityData = {
-                id = pCity:GetID(),
-                name = pCity:GetName(),
-                x = pCity:GetX(),
-                y = pCity:GetY(),
-                population = pCity:GetPopulation(),
-                is_capital = pCity:IsCapital(),
-            }
-
-            -- Production info
-            local pBuildQueue = pCity:GetBuildQueue()
-            if pBuildQueue then
-                local currentProduction = pBuildQueue:CurrentlyBuilding()
-                if currentProduction then
-                    cityData.producing = currentProduction
-                    cityData.turns_left = pBuildQueue:GetTurnsLeft()
-                end
-            end
-
-            table.insert(cities, cityData)
-        end
-    end
-    return cities
-end
-
--- Collect full game state
-local function CollectGameState()
-    local state = {
-        turn = g_CurrentTurn,
-        timestamp = os.time(),
-        game_id = g_GameID,
-        players = {},
-    }
-
-    -- Collect all human players
-    for playerID = 0, 63 do
-        local pPlayer = Players[playerID]
-        if pPlayer and pPlayer:IsAlive() then
-            local pConfig = PlayerConfigurations[playerID]
-            local isHuman = pConfig and pConfig:IsHuman() or false
-
-            -- Include humans and major AI civs
-            if isHuman or (pPlayer:IsMajor and pPlayer:IsMajor()) then
-                local playerData = {
-                    id = playerID,
-                    civ = GetCivName(playerID),
-                    leader = GetLeaderName(playerID),
-                    is_human = isHuman,
-                    cities = CollectCities(pPlayer),
-                    units = CollectUnits(pPlayer),
-                }
-
-                -- Gold
-                local pTreasury = pPlayer:GetTreasury()
-                if pTreasury then
-                    playerData.gold = pTreasury:GetGoldBalance()
-                end
-
-                -- Science/Culture progress
-                local pTechs = pPlayer:GetTechs()
-                if pTechs then
-                    playerData.techs_researched = pTechs:GetNumTechsResearched()
-                end
-
-                local pCulture = pPlayer:GetCulture()
-                if pCulture then
-                    playerData.civics_researched = pCulture:GetNumCivicsUnlocked()
-                end
-
-                table.insert(state.players, playerData)
-            end
-        end
-    end
-
-    return state
-end
-
--- Write game state to file
-local function UpdateGameState()
-    local state = CollectGameState()
-    WriteGameState(state)
-end
-
--- ============================================================================
--- CORE EVENT EMISSION
--- ============================================================================
 
 local function EmitEvent(eventType, data)
-    -- Build base event
     local event = {
-        event_type = eventType,
-        turn = g_CurrentTurn,
-        timestamp = os.time(),
-        game_id = g_GameID,
+        type = eventType,
+        turn = g_Turn,
+        ts = os.time(),
+        game_id = g_GameID
     }
-
-    -- Merge event-specific data
     if data then
         for k, v in pairs(data) do
             event[k] = v
         end
     end
 
-    -- Serialize and write
-    local json = SerializeToJSON(event)
-    local success = AppendLine(json)
-
-    if success then
-        g_EventCount = g_EventCount + 1
-        if CONFIG.DEBUG then
-            print("[LivingNarrator] Event #" .. g_EventCount .. ": " .. eventType)
-        end
+    local ok = AppendEvent(event)
+    if ok then
+        print("[LivingNarrator] Event: " .. eventType)
     end
+    return ok
+end
 
-    return success
+local function GetUnitTypeName(unitType)
+    local ok, result = pcall(function()
+        local info = GameInfo.Units[unitType]
+        if info then
+            return Locale.Lookup(info.Name)
+        end
+        return "Unit"
+    end)
+    return ok and result or "Unit"
+end
+
+local function CountPlayerUnits(playerID)
+    local ok, result = pcall(function()
+        local player = Players[playerID]
+        if not player then return {military = 0, civilian = 0} end
+        local units = player:GetUnits()
+        if not units then return {military = 0, civilian = 0} end
+
+        local military = 0
+        local civilian = 0
+        for i, unit in units:Members() do
+            local unitType = unit:GetType()
+            local info = GameInfo.Units[unitType]
+            if info and info.Combat and info.Combat > 0 then
+                military = military + 1
+            else
+                civilian = civilian + 1
+            end
+        end
+        return {military = military, civilian = civilian}
+    end)
+    return ok and result or {military = 0, civilian = 0}
 end
 
 -- ============================================================================
--- EVENT HANDLERS: TURNS
+-- EVENT HANDLERS
 -- ============================================================================
 
 local function OnTurnBegin(playerID)
-    if not CONFIG.EVENTS.TURNS then return end
-
-    -- Update current turn
-    g_CurrentTurn = Game.GetCurrentGameTurn()
-
-    -- Only emit for human players
-    if IsHumanPlayer(playerID) then
-        -- Update full game state at turn start
-        UpdateGameState()
-
-        EmitEvent("TURN_START", {
-            player_id = playerID,
-            player_civ = GetCivName(playerID),
-            player_leader = GetLeaderName(playerID),
-            is_local = (playerID == g_LocalPlayerID),
-        })
-    end
+    local ok, err = pcall(function()
+        g_Turn = Game.GetCurrentGameTurn()
+        if IsHumanPlayer(playerID) then
+            EmitEvent("TURN_START", {
+                player_id = playerID,
+                player_civ = GetCivName(playerID)
+            })
+            -- Emit turn summary with unit counts
+            local counts = CountPlayerUnits(playerID)
+            local player = Players[playerID]
+            local cityCount = 0
+            if player and player.GetCities then
+                local cities = player:GetCities()
+                if cities then cityCount = cities:GetCount() end
+            end
+            EmitEvent("TURN_SUMMARY", {
+                player_id = playerID,
+                player_civ = GetCivName(playerID),
+                military_units = counts.military,
+                civilian_units = counts.civilian,
+                cities = cityCount
+            })
+        end
+    end)
+    if not ok then print("[LivingNarrator] OnTurnBegin error: " .. tostring(err)) end
 end
 
 local function OnTurnEnd(playerID)
-    if not CONFIG.EVENTS.TURNS then return end
+    local ok, err = pcall(function()
+        if IsHumanPlayer(playerID) then
+            EmitEvent("TURN_END", {
+                player_id = playerID,
+                player_civ = GetCivName(playerID)
+            })
+        end
+    end)
+    if not ok then print("[LivingNarrator] OnTurnEnd error: " .. tostring(err)) end
+end
 
-    if IsHumanPlayer(playerID) then
-        EmitEvent("TURN_END", {
+local function OnCityBuilt(playerID, cityID, x, y)
+    local ok, err = pcall(function()
+        local cityName = "City"
+        local player = Players[playerID]
+        if player then
+            local city = player:GetCities():FindID(cityID)
+            if city then
+                local rawName = city:GetName()
+                cityName = Locale.Lookup(rawName) or rawName
+            end
+        end
+        EmitEvent("CITY_BUILT", {
+            city = cityName,
             player_id = playerID,
             player_civ = GetCivName(playerID),
+            x = x, y = y
         })
-    end
+    end)
+    if not ok then print("[LivingNarrator] OnCityBuilt error: " .. tostring(err)) end
 end
 
--- ============================================================================
--- EVENT HANDLERS: CITIES
--- ============================================================================
-
-local function OnCityInitialized(playerID, cityID, x, y)
-    if not CONFIG.EVENTS.CITIES then return end
-
-    EmitEvent("CITY_BUILT", {
-        city_name = GetCityName(playerID, cityID),
-        city_id = cityID,
-        player_id = playerID,
-        player_civ = GetCivName(playerID),
-        x = x,
-        y = y,
-        is_human = IsHumanPlayer(playerID),
-    })
+local function OnCityCaptured(newOwner, oldOwner, cityID)
+    local ok, err = pcall(function()
+        EmitEvent("CITY_CAPTURED", {
+            new_owner = GetCivName(newOwner),
+            old_owner = GetCivName(oldOwner)
+        })
+    end)
+    if not ok then print("[LivingNarrator] OnCityCaptured error: " .. tostring(err)) end
 end
-
-local function OnCityConquered(newOwnerID, oldOwnerID, cityID)
-    if not CONFIG.EVENTS.CITIES then return end
-
-    EmitEvent("CITY_CAPTURED", {
-        city_id = cityID,
-        new_owner_id = newOwnerID,
-        new_owner_civ = GetCivName(newOwnerID),
-        old_owner_id = oldOwnerID,
-        old_owner_civ = GetCivName(oldOwnerID),
-    })
-end
-
-local function OnCityRazed(playerID, cityName)
-    if not CONFIG.EVENTS.CITIES then return end
-
-    EmitEvent("CITY_RAZED", {
-        city_name = cityName,
-        player_id = playerID,
-        player_civ = GetCivName(playerID),
-    })
-end
-
-local function OnCityPopulationChanged(playerID, cityID, newPop)
-    if not CONFIG.EVENTS.CITIES then return end
-
-    -- Only emit for significant changes (growth, not decline from combat)
-    EmitEvent("CITY_GREW", {
-        city_name = GetCityName(playerID, cityID),
-        city_id = cityID,
-        player_id = playerID,
-        population = newPop,
-    })
-end
-
--- ============================================================================
--- EVENT HANDLERS: WONDERS
--- ============================================================================
 
 local function OnWonderCompleted(x, y, buildingID, playerID)
-    if not CONFIG.EVENTS.WONDERS then return end
-
-    local buildingInfo = GameInfo.Buildings[buildingID]
-    local wonderName = buildingInfo and Locale.Lookup(buildingInfo.Name) or "Unknown Wonder"
-
-    EmitEvent("WONDER_COMPLETED", {
-        wonder = wonderName,
-        wonder_id = buildingID,
-        player_id = playerID,
-        player_civ = GetCivName(playerID),
-        x = x,
-        y = y,
-        is_human = IsHumanPlayer(playerID),
-    })
-end
-
--- ============================================================================
--- EVENT HANDLERS: DIPLOMACY
--- ============================================================================
-
-local function OnDeclareWar(attackerID, defenderID)
-    if not CONFIG.EVENTS.DIPLOMACY then return end
-
-    EmitEvent("WAR_DECLARED", {
-        attacker_id = attackerID,
-        attacker_civ = GetCivName(attackerID),
-        attacker_leader = GetLeaderName(attackerID),
-        defender_id = defenderID,
-        defender_civ = GetCivName(defenderID),
-        defender_leader = GetLeaderName(defenderID),
-    })
-end
-
-local function OnMakePeace(playerID1, playerID2)
-    if not CONFIG.EVENTS.DIPLOMACY then return end
-
-    EmitEvent("PEACE_MADE", {
-        player1_id = playerID1,
-        player1_civ = GetCivName(playerID1),
-        player2_id = playerID2,
-        player2_civ = GetCivName(playerID2),
-    })
-end
-
-local function OnDenounce(denouncerID, denouncedID)
-    if not CONFIG.EVENTS.DIPLOMACY then return end
-
-    EmitEvent("DENOUNCEMENT", {
-        denouncer_id = denouncerID,
-        denouncer_civ = GetCivName(denouncerID),
-        denounced_id = denouncedID,
-        denounced_civ = GetCivName(denouncedID),
-    })
-end
-
-local function OnAllianceFormed(playerID1, playerID2, allianceType)
-    if not CONFIG.EVENTS.DIPLOMACY then return end
-
-    EmitEvent("ALLIANCE_FORMED", {
-        player1_id = playerID1,
-        player1_civ = GetCivName(playerID1),
-        player2_id = playerID2,
-        player2_civ = GetCivName(playerID2),
-        alliance_type = allianceType,
-    })
-end
-
--- ============================================================================
--- EVENT HANDLERS: COMBAT
--- ============================================================================
-
-local function OnUnitKilled(killedPlayerID, killedUnitID, killerPlayerID, killerUnitID)
-    if not CONFIG.EVENTS.COMBAT then return end
-
-    -- Only log significant combat (involving humans)
-    if IsHumanPlayer(killedPlayerID) or IsHumanPlayer(killerPlayerID) then
-        EmitEvent("UNIT_KILLED", {
-            killed_player_id = killedPlayerID,
-            killed_player_civ = GetCivName(killedPlayerID),
-            killer_player_id = killerPlayerID,
-            killer_player_civ = GetCivName(killerPlayerID),
+    local ok, err = pcall(function()
+        local info = GameInfo.Buildings[buildingID]
+        EmitEvent("WONDER_COMPLETED", {
+            wonder = info and Locale.Lookup(info.Name) or "Wonder",
+            player_civ = GetCivName(playerID)
         })
-    end
+    end)
+    if not ok then print("[LivingNarrator] OnWonderCompleted error: " .. tostring(err)) end
 end
 
--- ============================================================================
--- EVENT HANDLERS: RESEARCH
--- ============================================================================
-
-local function OnResearchCompleted(playerID, techID)
-    if not CONFIG.EVENTS.RESEARCH then return end
-
-    if IsHumanPlayer(playerID) then
-        local techInfo = GameInfo.Technologies[techID]
-        local techName = techInfo and Locale.Lookup(techInfo.Name) or "Unknown Tech"
-
-        EmitEvent("TECH_COMPLETED", {
-            tech = techName,
-            tech_id = techID,
-            player_id = playerID,
-            player_civ = GetCivName(playerID),
+local function OnWarDeclared(attacker, defender)
+    local ok, err = pcall(function()
+        EmitEvent("WAR_DECLARED", {
+            attacker = GetCivName(attacker),
+            defender = GetCivName(defender)
         })
-    end
+    end)
+    if not ok then print("[LivingNarrator] OnWarDeclared error: " .. tostring(err)) end
+end
+
+local function OnPeace(p1, p2)
+    local ok, err = pcall(function()
+        EmitEvent("PEACE_MADE", {
+            player1 = GetCivName(p1),
+            player2 = GetCivName(p2)
+        })
+    end)
+    if not ok then print("[LivingNarrator] OnPeace error: " .. tostring(err)) end
+end
+
+local function OnTechCompleted(playerID, techID)
+    local ok, err = pcall(function()
+        if IsHumanPlayer(playerID) then
+            local info = GameInfo.Technologies[techID]
+            EmitEvent("TECH_COMPLETED", {
+                tech = info and Locale.Lookup(info.Name) or "Tech",
+                player_civ = GetCivName(playerID)
+            })
+        end
+    end)
+    if not ok then print("[LivingNarrator] OnTechCompleted error: " .. tostring(err)) end
 end
 
 local function OnCivicCompleted(playerID, civicID)
-    if not CONFIG.EVENTS.RESEARCH then return end
+    local ok, err = pcall(function()
+        if IsHumanPlayer(playerID) then
+            local info = GameInfo.Civics[civicID]
+            EmitEvent("CIVIC_COMPLETED", {
+                civic = info and Locale.Lookup(info.Name) or "Civic",
+                player_civ = GetCivName(playerID)
+            })
+        end
+    end)
+    if not ok then print("[LivingNarrator] OnCivicCompleted error: " .. tostring(err)) end
+end
 
-    if IsHumanPlayer(playerID) then
-        local civicInfo = GameInfo.Civics[civicID]
-        local civicName = civicInfo and Locale.Lookup(civicInfo.Name) or "Unknown Civic"
+local function OnUnitKilled(killedPlayer, killedUnitID, killerPlayer, killerUnitID)
+    local ok, err = pcall(function()
+        if IsHumanPlayer(killedPlayer) or IsHumanPlayer(killerPlayer) then
+            -- Get unit details if available
+            local killedName = "Unit"
+            local killerName = "Unit"
+            local x, y = 0, 0
 
-        EmitEvent("CIVIC_COMPLETED", {
-            civic = civicName,
-            civic_id = civicID,
-            player_id = playerID,
-            player_civ = GetCivName(playerID),
+            local killedPlayerObj = Players[killedPlayer]
+            if killedPlayerObj then
+                local unit = killedPlayerObj:GetUnits():FindID(killedUnitID)
+                if unit then
+                    killedName = GetUnitTypeName(unit:GetType())
+                    x, y = unit:GetX(), unit:GetY()
+                end
+            end
+
+            local killerPlayerObj = Players[killerPlayer]
+            if killerPlayerObj then
+                local unit = killerPlayerObj:GetUnits():FindID(killerUnitID)
+                if unit then
+                    killerName = GetUnitTypeName(unit:GetType())
+                end
+            end
+
+            EmitEvent("UNIT_KILLED", {
+                killed_civ = GetCivName(killedPlayer),
+                killed_unit = killedName,
+                killer_civ = GetCivName(killerPlayer),
+                killer_unit = killerName,
+                x = x, y = y
+            })
+        end
+    end)
+    if not ok then print("[LivingNarrator] OnUnitKilled error: " .. tostring(err)) end
+end
+
+local function OnWonderStarted(x, y, buildingID, playerID)
+    local ok, err = pcall(function()
+        local info = GameInfo.Buildings[buildingID]
+        if info and info.IsWonder then
+            EmitEvent("WONDER_STARTED", {
+                wonder = Locale.Lookup(info.Name),
+                player_civ = GetCivName(playerID),
+                x = x, y = y
+            })
+        end
+    end)
+    if not ok then print("[LivingNarrator] OnWonderStarted error: " .. tostring(err)) end
+end
+
+local function OnDenounce(actingPlayer, targetPlayer)
+    local ok, err = pcall(function()
+        EmitEvent("DENOUNCEMENT", {
+            actor = GetCivName(actingPlayer),
+            target = GetCivName(targetPlayer)
         })
+    end)
+    if not ok then print("[LivingNarrator] OnDenounce error: " .. tostring(err)) end
+end
+
+local function OnAlliance(player1, player2, allianceType)
+    local ok, err = pcall(function()
+        EmitEvent("ALLIANCE_FORMED", {
+            player1 = GetCivName(player1),
+            player2 = GetCivName(player2),
+            alliance_type = allianceType or "unknown"
+        })
+    end)
+    if not ok then print("[LivingNarrator] OnAlliance error: " .. tostring(err)) end
+end
+
+local function OnUnitCreated(playerID, unitID)
+    local ok, err = pcall(function()
+        local player = Players[playerID]
+        if player then
+            local unit = player:GetUnits():FindID(unitID)
+            if unit then
+                local unitType = unit:GetType()
+                local unitName = GetUnitTypeName(unitType)
+                local info = GameInfo.Units[unitType]
+                local isMilitary = info and info.Combat and info.Combat > 0
+                EmitEvent("UNIT_CREATED", {
+                    player_id = playerID,
+                    player_civ = GetCivName(playerID),
+                    unit_name = unitName,
+                    is_military = isMilitary or false
+                })
+            end
+        end
+    end)
+    if not ok then print("[LivingNarrator] OnUnitCreated error: " .. tostring(err)) end
+end
+
+-- ============================================================================
+-- SAFE EVENT REGISTRATION
+-- ============================================================================
+
+local function SafeAdd(eventTable, handler, name)
+    if eventTable and eventTable.Add then
+        local ok, err = pcall(function()
+            eventTable.Add(handler)
+        end)
+        if ok then
+            print("[LivingNarrator] + " .. name)
+            return true
+        else
+            print("[LivingNarrator] - " .. name .. " (error: " .. tostring(err) .. ")")
+            return false
+        end
+    else
+        print("[LivingNarrator] - " .. name .. " (not available)")
+        return false
     end
 end
-
--- ============================================================================
--- EVENT HANDLERS: GREAT PEOPLE
--- ============================================================================
-
-local function OnGreatPersonActivated(playerID, unitID, greatPersonClassID, greatPersonIndividualID)
-    if not CONFIG.EVENTS.GREAT_PEOPLE then return end
-
-    local gpInfo = GameInfo.GreatPersonIndividuals[greatPersonIndividualID]
-    local gpName = gpInfo and Locale.Lookup(gpInfo.Name) or "Unknown Great Person"
-    local gpClass = GameInfo.GreatPersonClasses[greatPersonClassID]
-    local gpType = gpClass and Locale.Lookup(gpClass.Name) or "Unknown Type"
-
-    EmitEvent("GREAT_PERSON_EARNED", {
-        person_name = gpName,
-        person_type = gpType,
-        player_id = playerID,
-        player_civ = GetCivName(playerID),
-        is_human = IsHumanPlayer(playerID),
-    })
-end
-
--- ============================================================================
--- EVENT HANDLERS: RELIGION
--- ============================================================================
-
-local function OnReligionFounded(playerID, religionID)
-    if not CONFIG.EVENTS.RELIGION then return end
-
-    local religionInfo = GameInfo.Religions[religionID]
-    local religionName = religionInfo and Locale.Lookup(religionInfo.Name) or "Unknown Religion"
-
-    EmitEvent("RELIGION_FOUNDED", {
-        religion = religionName,
-        religion_id = religionID,
-        player_id = playerID,
-        player_civ = GetCivName(playerID),
-        is_human = IsHumanPlayer(playerID),
-    })
-end
-
--- ============================================================================
--- REGISTRATION
--- ============================================================================
 
 local function RegisterEventHandlers()
-    print("[LivingNarrator] Registering event handlers...")
+    print("[LivingNarrator] Registering events...")
 
-    -- Turn events
-    Events.TurnBegin.Add(OnTurnBegin)
-    Events.TurnEnd.Add(OnTurnEnd)
+    local count = 0
 
-    -- City events
-    Events.CityInitialized.Add(OnCityInitialized)
-    Events.CityConquered.Add(OnCityConquered)
-    -- Events.CityRazed not always available, may need alternative
+    if SafeAdd(Events.TurnBegin, OnTurnBegin, "TurnBegin") then count = count + 1 end
+    if SafeAdd(Events.TurnEnd, OnTurnEnd, "TurnEnd") then count = count + 1 end
+    if SafeAdd(Events.CityInitialized, OnCityBuilt, "CityInitialized") then count = count + 1 end
+    if SafeAdd(Events.CityConquered, OnCityCaptured, "CityConquered") then count = count + 1 end
+    if SafeAdd(Events.WonderCompleted, OnWonderCompleted, "WonderCompleted") then count = count + 1 end
+    if SafeAdd(Events.DiplomacyDeclareWar, OnWarDeclared, "DiplomacyDeclareWar") then count = count + 1 end
+    if SafeAdd(Events.DiplomacyMakePeace, OnPeace, "DiplomacyMakePeace") then count = count + 1 end
+    if SafeAdd(Events.ResearchCompleted, OnTechCompleted, "ResearchCompleted") then count = count + 1 end
+    if SafeAdd(Events.CivicCompleted, OnCivicCompleted, "CivicCompleted") then count = count + 1 end
+    if SafeAdd(Events.UnitKilledInCombat, OnUnitKilled, "UnitKilledInCombat") then count = count + 1 end
+    if SafeAdd(Events.UnitAddedToMap, OnUnitCreated, "UnitAddedToMap") then count = count + 1 end
+    if SafeAdd(Events.BuildingAddedToMap, OnWonderStarted, "BuildingAddedToMap") then count = count + 1 end
+    if SafeAdd(Events.DiplomacyDenounce, OnDenounce, "DiplomacyDenounce") then count = count + 1 end
+    if SafeAdd(Events.DiplomacyRelationshipChanged, OnAlliance, "DiplomacyRelationshipChanged") then count = count + 1 end
 
-    -- Wonder events
-    Events.WonderCompleted.Add(OnWonderCompleted)
-
-    -- Diplomacy events
-    Events.DiplomacyDeclareWar.Add(OnDeclareWar)
-    Events.DiplomacyMakePeace.Add(OnMakePeace)
-    -- Events.DiplomacyDenounce may vary by game version
-
-    -- Combat events
-    Events.UnitKilledInCombat.Add(OnUnitKilled)
-
-    -- Research events
-    Events.ResearchCompleted.Add(OnResearchCompleted)
-    Events.CivicCompleted.Add(OnCivicCompleted)
-
-    -- Great People
-    Events.UnitGreatPersonActivated.Add(OnGreatPersonActivated)
-
-    -- Religion
-    if Events.ReligionFounded then
-        Events.ReligionFounded.Add(OnReligionFounded)
-    end
-
-    print("[LivingNarrator] Event handlers registered")
+    print("[LivingNarrator] " .. count .. " events registered")
 end
 
 -- ============================================================================
@@ -559,71 +486,36 @@ end
 -- ============================================================================
 
 local function Initialize()
-    print("========================================")
-    print("[LivingNarrator] Initializing v" .. CONFIG.VERSION)
-    print("========================================")
+    print("[LivingNarrator] Init...")
 
-    -- Generate game session ID
-    g_GameID = GenerateGameID()
-    g_LocalPlayerID = Game.GetLocalPlayer()
-    g_CurrentTurn = Game.GetCurrentGameTurn()
-
-    print("[LivingNarrator] Game ID: " .. g_GameID)
-    print("[LivingNarrator] Local Player: " .. tostring(g_LocalPlayerID))
-
-    -- Initialize file writer
-    if InitializeEventFile() then
-        -- Emit game start event
-        EmitEvent("GAME_START", {
-            local_player_id = g_LocalPlayerID,
-            local_player_civ = GetCivName(g_LocalPlayerID),
-            local_player_leader = GetLeaderName(g_LocalPlayerID),
-            starting_turn = g_CurrentTurn,
-            version = CONFIG.VERSION,
-        })
-
-        -- Register all event handlers
-        RegisterEventHandlers()
-
-        print("[LivingNarrator] Ready!")
-    else
-        print("[LivingNarrator] ERROR: Failed to initialize. Events will not be recorded.")
+    if not InitializeFiles() then
+        print("[LivingNarrator] FATAL: Cannot init files")
+        return
     end
-end
 
--- ============================================================================
--- CONSOLE COMMANDS (for debugging)
--- ============================================================================
+    local ok, err = pcall(function()
+        g_Turn = Game.GetCurrentGameTurn()
+    end)
+    if not ok then
+        g_Turn = 0
+    end
 
-function LN_Status()
-    local stats = GetFileStats()
-    print("========================================")
-    print("[LivingNarrator] Status")
-    print("  Version: " .. CONFIG.VERSION)
-    print("  Game ID: " .. tostring(g_GameID))
-    print("  Turn: " .. tostring(g_CurrentTurn))
-    print("  Events: " .. tostring(g_EventCount))
-    print("  File: " .. tostring(stats.path))
-    print("  Writes: " .. tostring(stats.writes))
-    print("  Errors: " .. tostring(stats.errors))
-    print("========================================")
-end
+    RegisterEventHandlers()
 
-function LN_TestEvent()
-    EmitEvent("TEST_EVENT", {
-        message = "Manual test event",
-        triggered_by = "console",
+    local localPlayer = -1
+    ok, err = pcall(function()
+        localPlayer = Game.GetLocalPlayer()
+    end)
+
+    EmitEvent("GAME_START", {
+        local_player = localPlayer,
+        local_civ = GetCivName(localPlayer),
+        version = "2.5"
     })
-    print("[LivingNarrator] Test event emitted")
-end
 
-function LN_DumpState()
-    UpdateGameState()
-    print("[LivingNarrator] Game state written to file")
+    print("========================================")
+    print("[LivingNarrator] READY! v2.5")
+    print("========================================")
 end
-
--- ============================================================================
--- START
--- ============================================================================
 
 Initialize()

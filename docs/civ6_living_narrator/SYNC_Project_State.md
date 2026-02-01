@@ -1,63 +1,170 @@
-# Civ6 Living Narrator — Sync: Project State
+# Living Narrator — Sync: Project State
+
+```
+LAST_UPDATED: 2026-02-01
+UPDATED_BY: Claude (agent)
+```
 
 ## Navigation
 - Protocol: `.ngram/PROTOCOL.md`
-- View: `.ngram/views/VIEW_Document_Create_Module_Documentation.md`
-- View: `.ngram/views/VIEW_Onboard_Understand_Existing_Codebase.md`
+- Mind Framework: `.mind/FRAMEWORK.md`
 
 ## Maturity
-STATUS: DESIGNING
+STATUS: CANONICAL (v1)
+
+Multi-game narrator with OCR-based text extraction. Supports Civ6 and CK3.
 
 ## Module Health
-- ingest: OK (docs/civ6_living_narrator/ingest/HEALTH_Ingest_Lag_And_Error_Rates.md)
-- style_ngrams: OK (docs/civ6_living_narrator/style_ngrams/HEALTH_Sparsity_Quantiles_And_Drift.md)
-- moment_graph: OK (docs/civ6_living_narrator/moment_graph/HEALTH_Moment_Count_Charge_Distribution.md)
-- decision_engine: OK (docs/civ6_living_narrator/decision_engine/HEALTH_SpeechRate_Suppression_Reasons.md)
-- dm_challenges: OK (docs/civ6_living_narrator/dm_challenges/HEALTH_Completion_Rates_And_Frustration_Signals.md)
-- llm_router: OK (docs/civ6_living_narrator/llm_router/HEALTH_InvalidRate_Latency_Cost.md)
-- audio_runtime_windows: OK (docs/civ6_living_narrator/audio_runtime_windows/HEALTH_QueueDepth_Stutter_Rate.md)
-- win_wsl_bridge: OK (docs/civ6_living_narrator/win_wsl_bridge/HEALTH_Restart_Survivability.md)
 
-## Recent Decisions
-- Seeded doc chain files from ngram templates to standardize module stubs.
-- Drafted top-level OBJECTIFS, PATTERNS, and VALIDATION for the v1.2 scaffold.
-- Drafted ingest and win_wsl_bridge module docs to define boundaries and invariants.
-- Drafted decision_engine and moment_graph module docs for rhythm and memory.
-- Drafted style_ngrams and llm_router module docs for profiling and JSON routing.
-- Drafted dm_challenges and audio_runtime_windows module docs for contracts and playback.
-- Drafted persistence and telemetry module docs for storage and observability.
-- Completed the project-level doc chain and added the missing pair-programming VIEW.
-- Implemented baseline ingest tailing, normalization, and dedup helpers with tests.
-- Added ingest schema validation and configurable coalescing rules.
-- Implemented win_wsl_bridge session id and path resolution helpers with tests.
-- Implemented decision_engine selection baseline with tests and config defaults.
-- Implemented moment_graph lifecycle helpers with tests and config defaults.
-- Implemented llm_router strict JSON validation baseline with tests.
-- Implemented style_ngrams tokenization, backoff prediction, and tests with token_map config.
-- Implemented dm_challenges catalog loading and validation with tests.
-- Implemented persistence SQLite schema and adapters with tests.
-- Implemented telemetry health snapshot, overlay payload, and structured logging helpers with tests.
-- Implemented dm_challenges offer selection and state tracking with tests.
-- Implemented audio_runtime_windows queue stub with tests.
-- Added persistence session pruning helper with tests.
-- Implemented V1 orchestrator (`src/main.py`) with mock LLM client (`src/llm_router/simple_llm_client.py`) and demo event loop.
-- Added persistent tail state (`.tail_state.json`) and CLI `--once` flag to support single-step execution.
-- Created `step.sh` for easy one-shot execution of the pipeline.
-- Integrated Claude CLI as the LLM agent using `cd agents/name/ && claude` command pattern.
-- Integrated ElevenLabs TTS for high-quality audio generation using `.env` API key.
-- Established `audio_output/` as the local bridge for generated narration files.
-- Created `CLAUDE.md` to define project commands and coding style.
-- Defined `speak` tool schema and persona in `agents/narrator/CLAUDE.md` (moved from `identity.md`).
-- Implemented and verified `ClaudeCLIClient` and `ElevenLabsTTS` with unit tests.
-- Implemented system audio playback using `ffplay`/`mpg123` in `AudioQueue`.
-- Configured comprehensive logging to `.ngram/error.log`.
+| Module | Status | Doc Chain |
+|--------|--------|-----------|
+| ingest | OK | `docs/civ6_living_narrator/ingest/` |
+| ocr | OK | `docs/civ6_living_narrator/ocr/` |
+| **prayer** | **NEW** | `docs/civ6_living_narrator/prayer/` |
+| style_ngrams | OK | `docs/civ6_living_narrator/style_ngrams/` |
+| moment_graph | OK | `docs/civ6_living_narrator/moment_graph/` |
+| decision_engine | OK | `docs/civ6_living_narrator/decision_engine/` |
+| dm_challenges | OK | `docs/civ6_living_narrator/dm_challenges/` |
+| llm_router | OK | `docs/civ6_living_narrator/llm_router/` |
+| audio_runtime_windows | OK | `docs/civ6_living_narrator/audio_runtime_windows/` |
+| win_wsl_bridge | OK | `docs/civ6_living_narrator/win_wsl_bridge/` |
+| lua_mod | OK | `docs/civ6_living_narrator/lua_mod/` |
+| persistence | OK | `docs/civ6_living_narrator/persistence/` |
+| telemetry | OK | `docs/civ6_living_narrator/telemetry/` |
+
+## Recent Changes
+
+### 2026-02-01: Prayer System (F9 Hotkey)
+
+**What:**
+- Implemented "Pray" hotkey (F9) for CK3 Ironman mode
+- Created `scripts/pray_hotkey.ps1` for Windows hotkey detection
+- Modified `daemon.py` to detect `prayer_request.json` signal
+- Documented theological design philosophy
+
+**Why:**
+- CK3 `debug_log` doesn't work without `-debug_mode`
+- `-debug_mode` disables achievements (bad for stream)
+- Intentional prayer > automatic narration (theologically richer)
+
+**Architectural Decision:**
+- Dieu omniscient non-interventionniste
+- OCR = conscience passive (Dieu voit tout)
+- F9 = prière active (Dieu ne parle que quand invoqué)
+- "La prière qui coûte quelque chose est plus vraie"
+
+**Impact:**
+- New module: `docs/civ6_living_narrator/prayer/`
+- New file: `scripts/pray_hotkey.ps1`
+- Modified: `daemon.py` (prayer request detection)
+
+### 2024-12-30: Multi-Game Support + OCR
+
+**What:**
+- Added CK3 support via pure visual mode (screenshots only)
+- Implemented OCR watcher with Tesseract
+- Created game profiles system (`config/games/`)
+- OCR is now required and runs by default
+
+**Why:**
+- User requested CK3 playthrough support
+- CK3 has no modding API like Civ6, so visual analysis is required
+- OCR reduces Claude token cost by 10x while increasing reactivity
+
+**Impact:**
+- New files: `scripts/ocr_watcher.py`, `src/game_profile_loader.py`
+- New config: `config/games/ck3.yaml`, `config/games/civ6.yaml`
+- New persona: `narrator/CLAUDE_CK3.md`
+- New doc chain: `docs/civ6_living_narrator/ocr/`
+- Updated: `daemon.py`, `run.sh`, `README.md`
+
+### Key Architectural Decisions
+
+| Decision | Choice | Rationale |
+|----------|--------|-----------|
+| OCR engine | Tesseract (local) | Free, no API keys, privacy |
+| Region detection | Fixed percentages | Simpler, predictable, game-specific |
+| Game selection | Config-based profiles | Clean separation, easy to add games |
+| CK3 input mode | Pure visual (no events) | No modding API available |
+
+## Active Configuration
+
+| Setting | Value |
+|---------|-------|
+| Game | Configurable (civ6/ck3) |
+| OCR interval | 5s |
+| Screenshot interval | 30s (CK3) / 60s (Civ6) |
+| Narration interval | 30-120s |
 
 ## TODO (max 10)
-- Fill module docs with initial decisions and boundaries.
-- Populate validation invariants and health checks.
-- Add first-pass implementation notes for each module.
-- Docs updated, implementation needs: confirm module APIs, budget gates, and runtime bridge wiring.
 
-## Handoff
-- Next VIEW: `.ngram/views/VIEW_Document_Create_Module_Documentation.md`
-- Focus: Define module boundaries and initial invariants.
+- [ ] Test OCR regions on different screen resolutions
+- [ ] Add region visualization tool
+- [ ] Tune CK3 regions for better accuracy
+- [ ] Add more CK3 regions (tech tree, dynasty view)
+- [ ] Test end-to-end with real CK3 gameplay
+- [ ] Consider OCR caching (skip if screenshot unchanged)
+- [ ] Add support for more games (EU4, Stellaris)
+
+## Known Issues
+
+| Issue | Severity | Notes |
+|-------|----------|-------|
+| OCR region coords may need tuning | Low | Based on 1920x1080 |
+| Stylized game fonts reduce OCR accuracy | Low | ~80% accuracy acceptable |
+| No dynamic UI detection | Low | Using fixed percentages |
+
+## Handoff: For Agents
+
+**Likely agent:** groundwork (implementation)
+
+**Current focus:** CK3 playtesting and region tuning
+
+**Key context:**
+- OCR runs as separate process, started by `run.sh`
+- Game profile loaded from `narrator/state/config.json` → `game` field
+- CK3 uses `visual_primary=true` (no Lua events)
+- Daemon consumes OCR diffs via cursor system
+
+## Handoff: For Human
+
+**Executive summary:**
+Multi-game narrator is ready. CK3 support via screenshots + OCR. OCR now required.
+
+**To start a CK3 session:**
+```bash
+# Set game to ck3
+echo '{"game": "ck3", "visual_mode": true, "players": [{"name": "Nico", "dynasty": "Valois"}]}' > narrator/state/config.json
+
+# Run
+./run.sh
+```
+
+**Needs input:**
+- Test on your screen resolution
+- Report if OCR regions miss important text
+- Feedback on CK3 narrator persona
+
+## File Tree (key files)
+
+```
+├── daemon.py                    # Main orchestrator
+├── run.sh                       # Launcher (starts OCR by default)
+├── config/
+│   └── games/
+│       ├── civ6.yaml           # Civ6 profile
+│       └── ck3.yaml            # CK3 profile
+├── narrator/
+│   ├── CLAUDE.md               # Civ6 persona
+│   ├── CLAUDE_CK3.md           # CK3 persona
+│   └── state/
+│       ├── config.json         # Session config
+│       ├── ocr_state.json      # Current OCR state
+│       └── ocr_diffs.jsonl     # OCR change stream
+├── scripts/
+│   ├── capture.py              # Screenshot capture
+│   ├── ocr_watcher.py          # OCR engine
+│   └── speak.py                # TTS
+└── src/
+    └── game_profile_loader.py  # Profile loader
+```

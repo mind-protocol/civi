@@ -1,0 +1,71 @@
+# Game Profile: Civilization VI
+# Used by Living Narrator daemon
+
+game:
+  id: "civ6"
+  name: "Civilization VI"
+
+# Narrator persona file (relative to narrator/)
+narrator:
+  persona_file: "CLAUDE.md"
+  role: "Pote de table pour Civ 6 coop"
+
+# Input sources
+input:
+  # Lua mod extracts events to this log
+  lua_log: true
+  lua_log_default: "/mnt/c/Users/{user}/AppData/Local/Firaxis Games/Sid Meier's Civilization VI/Logs/Lua.log"
+
+  # Visual mode (screenshots)
+  visual: true
+  screenshot_interval: 60
+
+  # Voice transcripts
+  voice: true
+
+# Event types that bypass timing (trigger immediate narration)
+urgent_events:
+  - GAME_START
+  - WAR_DECLARED
+  - CITY_CAPTURED
+  - CAPITAL_CAPTURED
+  - PLAYER_ELIMINATED
+  - WONDER_COMPLETED
+  - WONDER_STARTED
+  - PEACE_MADE
+  - DENOUNCEMENT
+  - ALLIANCE_FORMED
+
+# Concepts for this game (helps narrator focus)
+concepts:
+  primary:
+    - empires
+    - cities
+    - wonders
+    - wars
+    - techs
+    - civics
+    - units
+  social:
+    - alliances
+    - denouncements
+    - trading
+  victory:
+    - domination
+    - science
+    - culture
+    - religion
+    - diplomatic
+
+# State files (beyond common ones)
+state_files:
+  - moments.json    # Pivotal moments
+  - threads.json    # Narrative arcs
+  - ideas.json      # Future callbacks
+
+# Player config template
+player_template:
+  fields:
+    - name          # Real name
+    - civ           # Civilization played
+    - is_local      # Is this the host player?

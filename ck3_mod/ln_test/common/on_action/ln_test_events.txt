@@ -1,0 +1,40 @@
+﻿# Living Narrator Test - Validate debug_log in Ironman
+# Tests if debug_log writes to debug.log without -debug_mode
+
+# Hook: Game start (extends base game on_action)
+on_game_start = {
+	effect = {
+		every_player = {
+			limit = { is_ai = no }
+			debug_log = "LN_TEST: Game started - Living Narrator test mod loaded"
+			debug_log = "LN_EVENT: {\"type\":\"GAME_START\",\"player\":\"[ROOT.GetName]\",\"faith\":\"[ROOT.faith.GetName]\"}"
+		}
+	}
+}
+
+# Hook: Yearly tick (less spam than monthly)
+on_yearly_pulse = {
+	effect = {
+		# ROOT = character receiving the pulse
+		if = {
+			limit = { is_ai = no }
+			debug_log = "LN_EVENT: {\"type\":\"YEARLY_PULSE\",\"character\":\"[ROOT.GetName]\",\"year\":\"[GetYear]\"}"
+		}
+	}
+}
+
+# Hook: Character death
+on_death = {
+	effect = {
+		# ROOT = character who died
+		debug_log = "LN_EVENT: {\"type\":\"CHARACTER_DEATH\",\"character\":\"[ROOT.GetName]\",\"age\":\"[ROOT.GetAge]\"}"
+	}
+}
+
+# Hook: War started
+on_war_started = {
+	effect = {
+		# ROOT = war
+		debug_log = "LN_EVENT: {\"type\":\"WAR_STARTED\",\"name\":\"[ROOT.GetName]\"}"
+	}
+}

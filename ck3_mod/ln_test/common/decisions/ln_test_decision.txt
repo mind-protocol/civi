@@ -1,0 +1,18 @@
+﻿ln_test_log_decision = {
+	picture = "gfx/interface/illustrations/decisions/decision_realm.dds"
+	desc = ln_test_log_decision_desc
+	is_shown = {
+		is_ai = no
+	}
+	is_valid = {
+		always = yes
+	}
+	effect = {
+		debug_log = "LN_EVENT: {\"type\":\"TEST_DECISION\",\"character\":\"[ROOT.GetName]\",\"faith\":\"[ROOT.faith.GetName]\"}"
+		custom_tooltip = ln_test_log_decision_effect_tooltip
+	}
+	ai_check_interval = 0
+	cost = {
+		piety = 0
+	}
+}

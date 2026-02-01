@@ -65,9 +65,9 @@ def speak(text: str, cache: bool = False) -> bool:
         "text": text,
         "model_id": MODEL_ID,
         "voice_settings": {
-            "stability": 0.5,
-            "similarity_boost": 0.75,
-            "style": 0.5,
+            "stability": 0.3,          # Lower = more expressive/variable
+            "similarity_boost": 0.8,    # Keep voice identity
+            "style": 0.8,               # Higher = more stylized/dramatic
             "use_speaker_boost": True
         }
     }
@@ -109,49 +109,64 @@ def speak(text: str, cache: bool = False) -> bool:
 def play_audio(path: Path) -> bool:
     """
     Play an audio file.
-    Tries multiple methods for cross-platform support.
+    Uses PowerShell MediaPlayer for WSL->Windows playback (no focus steal).
     """
-    path_str = str(path)
+    # Boost volume with ffmpeg (3x louder)
+    boosted_path = path.with_suffix(".boosted.mp3")
+    try:
+        subprocess.run(
+            ["ffmpeg", "-y", "-i", str(path), "-filter:a", "volume=3.0", str(boosted_path)],
+            capture_output=True,
+            timeout=10
+        )
+        if boosted_path.exists():
+            path = boosted_path
+    except Exception:
+        pass  # Use original if boost fails
 
-    # Convert to Windows path if needed (for WSL playing on Windows)
-    if path_str.startswith("/tmp"):
-        # For temp files, copy to a location accessible from Windows
-        win_tmp = Path("/mnt/c/Temp")
-        if win_tmp.exists():
-            win_path = win_tmp / path.name
-            win_path.write_bytes(path.read_bytes())
-            path_str = f"C:\\Temp\\{path.name}"
-            path = win_path
+    # Copy to Windows-accessible location
+    win_tmp = Path("/mnt/c/Temp")
+    win_tmp.mkdir(exist_ok=True)
+    win_path = win_tmp / f"narrator_{path.name}"
+    win_path.write_bytes(path.read_bytes())
+    win_path_str = f"C:\\Temp\\narrator_{path.name}"
 
-    players = [
-        # Windows via PowerShell (for WSL)
-        ["powershell.exe", "-c", f"Add-Type -AssemblyName PresentationCore; $player = New-Object System.Windows.Media.MediaPlayer; $player.Open('{path_str}'); $player.Play(); Start-Sleep -Seconds 10; $player.Close()"],
-        # Alternative Windows player
-        ["powershell.exe", "-c", f"(New-Object Media.SoundPlayer '{path_str}').PlaySync()"],
-        # Linux with ffplay
-        ["ffplay", "-nodisp", "-autoexit", "-loglevel", "quiet", str(path)],
-        # Linux with mpv
-        ["mpv", "--no-video", "--really-quiet", str(path)],
-        # Mac
-        ["afplay", str(path)],
-    ]
+    # PowerShell command that plays in background without stealing focus
+    ps_cmd = f"""
+    Add-Type -AssemblyName presentationCore
+    $player = New-Object System.Windows.Media.MediaPlayer
+    $player.Open('{win_path_str}')
+    $player.Volume = 1.0
+    $player.Play()
+    Start-Sleep -Milliseconds 2000
+    while($player.Position -lt $player.NaturalDuration.TimeSpan) {{ Start-Sleep -Milliseconds 100 }}
+    $player.Close()
+    """
 
-    for player_cmd in players:
-        try:
-            result = subprocess.run(
-                player_cmd,
-                capture_output=True,
-                timeout=60
-            )
-            if result.returncode == 0:
-                print("🔊 Audio played")
-                return True
-        except (subprocess.TimeoutExpired, FileNotFoundError, OSError):
-            continue
-
-    print("⚠️  Could not play audio - no suitable player found")
-    print(f"   Audio saved at: {path}")
-    return False
+    try:
+        result = subprocess.run(
+            ["powershell.exe", "-c", ps_cmd],
+            capture_output=True,
+            timeout=60
+        )
+        if result.returncode == 0:
+            print("🔊 Audio played")
+            # Cleanup
+            try:
+                win_path.unlink()
+            except:
+                pass
+            return True
+        else:
+            print(f"⚠️  PowerShell error: {result.stderr.decode()[:200]}")
+            return False
+    except subprocess.TimeoutExpired:
+        print("⚠️  Audio playback timed out")
+        return False
+    except Exception as e:
+        print(f"⚠️  Could not play audio: {e}")
+        print(f"   Audio saved at: {win_path_str}")
+        return False
 
 
 def list_voices():

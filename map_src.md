@@ -1,21 +1,21 @@
-# Repository Map: civi/src
+# Repository Map: duoai/src
 
-*Generated: 2025-12-22 18:47*
+*Generated: 2026-02-01 15:32*
 
 ## Statistics
 
-- **Files:** 26
+- **Files:** 28
 - **Directories:** 11
-- **Total Size:** 47.2K
+- **Total Size:** 64.9K
 - **Doc Files:** 0
-- **Code Files:** 26
+- **Code Files:** 28
 - **Areas:** 1 (docs/ subfolders)
-- **Modules:** 10 (subfolders in areas)
+- **Modules:** 12 (subfolders in areas)
 - **DOCS Links:** 0 (0.0 avg per code file)
 
 ### By Language
 
-- python: 26
+- python: 28
 
 ## File Tree
 
@@ -30,13 +30,14 @@
 │   ├── challenge_catalog_loader_and_validator.py (1.9K)
 │   ├── challenge_offer_generator.py (910)
 │   └── challenge_state_tracker_and_evaluator.py (955)
-├── ingest/ (8.0K)
-│   ├── civ6_jsonl_tail_reader.py (1.4K)
+├── ingest/ (10.5K)
+│   ├── civ6_jsonl_tail_reader.py (2.0K)
 │   ├── event_deduplicator_and_coalescer.py (3.0K)
+│   ├── player_resolver.py (2.0K)
 │   └── raw_event_parser_and_normalizer.py (3.5K)
-├── llm_router/ (5.1K)
+├── llm_router/ (7.8K)
 │   ├── context_pack_builder_and_truncator.py (597)
-│   ├── simple_llm_client.py (2.9K)
+│   ├── simple_llm_client.py (5.5K)
 │   ├── strict_json_output_validator_and_repair_pass.py (1.5K)
 │   └── (..1 more files)
 ├── moment_graph/ (3.6K)
@@ -59,7 +60,8 @@
 │   ├── bridge_path_resolver.py (692)
 │   ├── session_file_rotator.py (998)
 │   └── (..1 more files)
-└── main.py (7.8K)
+├── game_profile_loader.py (4.5K)
+└── main.py (15.7K)
 ```
 
 ## File Details
@@ -133,6 +135,15 @@
 - `def _rules_from_types()`
 - `def coalesce_events()`
 
+### `ingest/player_resolver.py`
+
+**Definitions:**
+- `class PlayerResolver`
+- `def __init__()`
+- `def _load_config()`
+- `def resolve_persona()`
+- `def enrich_event()`
+
 ### `ingest/raw_event_parser_and_normalizer.py`
 
 **Definitions:**
@@ -150,9 +161,10 @@
 ### `llm_router/simple_llm_client.py`
 
 **Definitions:**
-- `class ClaudeCLIClient`
+- `class LLMCLIClient`
 - `def __init__()`
 - `def generate_json()`
+- `def _call_gemini()`
 - `def _call_claude()`
 
 ### `llm_router/strict_json_output_validator_and_repair_pass.py`
@@ -273,12 +285,22 @@
 - `def resolve_session_file()`
 - `def rotate_if_needed()`
 
+### `game_profile_loader.py`
+
+**Definitions:**
+- `class GameProfile`
+- `def load_game_profile()`
+- `def get_persona_path()`
+- `def detect_game_from_config()`
+- `def list_available_games()`
+
 ### `main.py`
 
 **Imports:**
 - `ingest/civ6_jsonl_tail_reader`
 - `ingest/raw_event_parser_and_normalizer`
 - `ingest/event_deduplicator_and_coalescer`
+- `ingest/player_resolver`
 - `decision_engine/candidate_builder_for_speakers`
 - `decision_engine/candidate_ranker_and_selector_with_explainability`
 - `decision_engine/narrative_budget_and_cooldown_enforcer`
@@ -288,5 +310,5 @@
 **Definitions:**
 - `def load_tail_state()`
 - `def save_tail_state()`
-- `def build_mock_candidates()`
+- `def build_candidates()`
 - `def main()`

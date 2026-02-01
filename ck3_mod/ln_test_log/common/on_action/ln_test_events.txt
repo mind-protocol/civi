@@ -1,0 +1,16 @@
+# LN Test Log - Validates debug_log works in Ironman
+# If this works, we'll see [LN_TEST] in debug.log on game start
+
+on_game_start = {
+	effect = {
+		debug_log = "[LN_TEST]{\"type\":\"GAME_START\",\"date\":\"[GetDateString]\"}"
+		debug_log = "LN_TEST: Game started - If you see this in Ironman, debug_log works!"
+	}
+}
+
+# Also test on ruler death (will trigger when any ruler dies)
+on_death = {
+	effect = {
+		debug_log = "[LN_TEST]{\"type\":\"DEATH\",\"character\":\"[ROOT.GetName]\",\"date\":\"[GetDateString]\"}"
+	}
+}

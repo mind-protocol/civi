@@ -11,3 +11,4 @@
 {"event_type": "TURN_START", "turn": 15, "timestamp": 15000}
 {"event_type": "WONDER_COMPLETED", "turn": 16, "wonder": "Stonehenge"}
 {"event_type": "WONDER_COMPLETED", "turn": 17, "wonder": "Pyramids"}
+{"event_type": "CITY_BUILT", "turn": 18}

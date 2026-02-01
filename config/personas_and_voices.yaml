@@ -1,0 +1,17 @@
+# Mapping of in-game entities to Real World Personas
+
+players:
+  # The local player (Nico)
+  local_player:
+    name: "Nico"
+    description: "Le joueur principal, un stratège ambitieux mais parfois distrait."
+  
+  # Aurore (Guest player)
+  aurore:
+    name: "Aurore"
+    description: "Une bâtisseuse de merveilles compulsive, joueuse humaine."
+
+narrator:
+  name: "Narrateur"
+  personality: "Cynique, historique, légèrement moqueur. Il s'adresse directement à Nico."
+  language: "fr"
