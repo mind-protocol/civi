@@ -51,7 +51,8 @@ function Capture-Screen {
 function Send-Prayer {
     param(
         [string]$ScreenshotPath,
-        [string]$Message = ""
+        [string]$Message = "",
+        [string]$Hotkey = "F9"
     )
 
     $timestamp = Get-Date -Format "o"
@@ -64,7 +65,9 @@ function Send-Prayer {
         type = "prayer_request"
         screenshot = $wslScreenshot
         screenshot_win = $ScreenshotPath
-        message = if ($Message) { $Message } else { "Le joueur invoque le chroniqueur" }
+        hotkey = $Hotkey
+        mode = $HotkeyModes[$Hotkey]
+        message = if ($Message) { $Message } else { "" }
     }
 
     # Write signal file (daemon watches this)
@@ -87,64 +90,118 @@ function Play-Chime {
     [Console]::Beep(1000, 150)
 }
 
-# Key codes
-$VK_F9 = 0x78
+# Key codes - Mode hotkeys
+$VK_F8 = 0x77   # Architect
+$VK_F9 = 0x78   # Partner (default)
+$VK_F10 = 0x79  # Witness
+$VK_F11 = 0x7A  # Rubber Duck
+$VK_F12 = 0x7B  # Critic
 $VK_ESC = 0x1B
+
+# Hotkey to mode mapping
+$HotkeyModes = @{
+    "F8" = "architect"
+    "F9" = "partner"
+    "F10" = "witness"
+    "F11" = "rubber_duck"
+    "F12" = "critic"
+}
+
+# Mode colors for display
+$ModeColors = @{
+    "F8" = "Magenta"
+    "F9" = "Yellow"
+    "F10" = "Blue"
+    "F11" = "Green"
+    "F12" = "Red"
+}
 
 # Main loop
 Write-Host ""
 Write-Host "  ========================================" -ForegroundColor Cyan
-Write-Host "     LIVING NARRATOR - PRAY HOTKEY" -ForegroundColor Cyan
+Write-Host "         MANEMUS - PRAY HOTKEY" -ForegroundColor Cyan
 Write-Host "  ========================================" -ForegroundColor Cyan
 Write-Host ""
-Write-Host "     F9  = Prier (capture + narration)" -ForegroundColor Yellow
+Write-Host "     F8  = Architect (zoom out)" -ForegroundColor Magenta
+Write-Host "     F9  = Partner (default)" -ForegroundColor Yellow
+Write-Host "     F10 = Witness (presence)" -ForegroundColor Blue
+Write-Host "     F11 = Rubber Duck (listen)" -ForegroundColor Green
+Write-Host "     F12 = Critic (stress-test)" -ForegroundColor Red
+Write-Host ""
 Write-Host "     ESC = Quitter" -ForegroundColor DarkGray
 Write-Host ""
 Write-Host "  Screenshots: $OutputDir"
 Write-Host "  Signal: $SignalDir"
 Write-Host ""
-Write-Host "  En attente de prieres..." -ForegroundColor Green
+Write-Host "  En attente..." -ForegroundColor Green
 Write-Host ""
 
-$f9WasDown = $false
+# Track key states
+$keyStates = @{
+    "F8" = $false
+    "F9" = $false
+    "F10" = $false
+    "F11" = $false
+    "F12" = $false
+}
 $prayerCount = 0
 
 while ($true) {
-    $f9Down = [KeyState]::IsKeyDown($VK_F9)
     $escDown = [KeyState]::IsKeyDown($VK_ESC)
 
     if ($escDown) {
         Write-Host ""
-        Write-Host "  Que Dieu vous garde." -ForegroundColor Cyan
+        Write-Host "  Manemus." -ForegroundColor Cyan
         break
     }
 
-    # Detect F9 press (not hold)
-    if ($f9Down -and -not $f9WasDown) {
+    # Check all mode hotkeys
+    $keysDown = @{
+        "F8" = [KeyState]::IsKeyDown($VK_F8)
+        "F9" = [KeyState]::IsKeyDown($VK_F9)
+        "F10" = [KeyState]::IsKeyDown($VK_F10)
+        "F11" = [KeyState]::IsKeyDown($VK_F11)
+        "F12" = [KeyState]::IsKeyDown($VK_F12)
+    }
+
+    # Detect any new key press
+    $pressedKey = $null
+    foreach ($key in $keysDown.Keys) {
+        if ($keysDown[$key] -and -not $keyStates[$key]) {
+            $pressedKey = $key
+            break
+        }
+    }
+
+    if ($pressedKey) {
         $prayerCount++
         $time = Get-Date -Format "HH:mm:ss"
+        $mode = $HotkeyModes[$pressedKey]
+        $color = $ModeColors[$pressedKey]
 
         Write-Host "  [$time] " -NoNewline -ForegroundColor DarkGray
-        Write-Host "F9 " -NoNewline -ForegroundColor Yellow
-        Write-Host "- Priere #$prayerCount detectee" -ForegroundColor White
+        Write-Host "$pressedKey " -NoNewline -ForegroundColor $color
+        Write-Host "- $mode #$prayerCount" -ForegroundColor White
 
         # Capture screen
-        Write-Host "           Capture en cours... " -NoNewline
+        Write-Host "           Capture... " -NoNewline
         $screenshot = Capture-Screen
         Write-Host "OK" -ForegroundColor Green
 
-        # Send signal
-        Write-Host "           Signal envoye... " -NoNewline
-        $signal = Send-Prayer -ScreenshotPath $screenshot
+        # Send signal with hotkey
+        Write-Host "           Signal... " -NoNewline
+        Send-Prayer -ScreenshotPath $screenshot -Hotkey $pressedKey | Out-Null
         Write-Host "OK" -ForegroundColor Green
 
-        # Audio feedback
         Play-Chime
-
-        Write-Host "           Le chroniqueur a entendu votre appel." -ForegroundColor Cyan
+        Write-Host "           Mode: $mode" -ForegroundColor $color
         Write-Host ""
     }
 
-    $f9WasDown = $f9Down
+    # Update key states
+    foreach ($key in $keysDown.Keys) {
+        $keyStates[$key] = $keysDown[$key]
+    }
+
     Start-Sleep -Milliseconds 50
 }

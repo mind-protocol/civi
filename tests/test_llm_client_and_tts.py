@@ -4,37 +4,58 @@ import unittest
 from unittest.mock import patch, MagicMock
 import json
 import os
-from src.llm_router.simple_llm_client import ClaudeCLIClient
+from src.llm_router.simple_llm_client import LLMCLIClient
 from src.audio_runtime_windows.elevenlabs_tts import ElevenLabsTTS
 
-class TestClaudeCLIClient(unittest.TestCase):
+
+class TestLLMCLIClient(unittest.TestCase):
     @patch("subprocess.run")
-    def test_generate_json_success(self, mock_run):
-        # Setup mock return
+    @patch.dict(os.environ, {"SELECTED_MODEL": "claude"})
+    def test_generate_json_claude_success(self, mock_run):
         mock_process = MagicMock()
         mock_process.stdout = 'Some chat... {"tool": "speak", "parameters": {"text": "Hello world"}} ... more chat'
         mock_run.return_value = mock_process
 
-        client = ClaudeCLIClient(agent_name="test_agent")
+        client = LLMCLIClient(agent_name="test_agent")
+        client.model = "claude"
         response = client.generate_json("Test prompt")
 
         self.assertEqual(response["tool"], "speak")
         self.assertEqual(response["parameters"]["text"], "Hello world")
-        
-        # Verify command construction
+
         args, kwargs = mock_run.call_args
         command = args[0]
         self.assertIn("cd agents/test_agent", command)
         self.assertIn("claude -p", command)
+        self.assertTrue(kwargs.get("shell"))
+
+    @patch("subprocess.run")
+    @patch.dict(os.environ, {"SELECTED_MODEL": "gemini"})
+    def test_generate_json_gemini_success(self, mock_run):
+        mock_process = MagicMock()
+        mock_process.stdout = '{"tool": "speak", "parameters": {"text": "Bonjour"}}'
+        mock_run.return_value = mock_process
+
+        client = LLMCLIClient(agent_name="test_agent")
+        client.model = "gemini"
+        response = client.generate_json("Test prompt")
+
+        self.assertEqual(response["tool"], "speak")
+        self.assertEqual(response["parameters"]["text"], "Bonjour")
+
+        args, kwargs = mock_run.call_args
+        command = args[0]
+        self.assertEqual(command[0], "gemini")
+        self.assertIn("Test prompt", command)
+        self.assertEqual(kwargs.get("cwd"), "agents/test_agent")
 
     @patch("subprocess.run")
     def test_generate_json_failure(self, mock_run):
-        # Simulate CLI failure
         mock_run.side_effect = Exception("CLI failed")
-        
-        client = ClaudeCLIClient()
+
+        client = LLMCLIClient()
         response = client.generate_json("Test")
-        
+
         self.assertEqual(response["mood"], "error")
 
 class TestElevenLabsTTS(unittest.TestCase):
