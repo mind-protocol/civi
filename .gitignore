@@ -26,3 +26,4 @@ narrator/state/
 # Mind runtime
 .mind/runtime/
 .env
+narrator/logs/
