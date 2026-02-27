@@ -4,6 +4,8 @@
 
 # Local env
 .env
+.env.local
+.env.*.local
 .venv
 venv/
 __pycache__/
@@ -21,9 +23,5 @@ narrator/state/
 
 # Mind runtime
 .mind/mind/
-.env
-
-# Mind runtime
 .mind/runtime/
-.env
 narrator/logs/
