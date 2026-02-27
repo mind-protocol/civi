@@ -21,6 +21,9 @@ narrator/state/
 .vscode/
 .idea/
 
+# Windows NTFS artifacts
+*:Zone.Identifier
+
 # Mind runtime
 .mind/mind/
 .mind/runtime/
