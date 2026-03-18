@@ -1,6 +1,6 @@
 # Repository Map: duoai/src
 
-*Generated: 2026-02-01 15:32*
+*Generated: 2026-03-12 08:40*
 
 ## Statistics
 
@@ -10,7 +10,7 @@
 - **Doc Files:** 0
 - **Code Files:** 28
 - **Areas:** 1 (docs/ subfolders)
-- **Modules:** 12 (subfolders in areas)
+- **Modules:** 13 (subfolders in areas)
 - **DOCS Links:** 0 (0.0 avg per code file)
 
 ### By Language

@@ -1,18 +1,18 @@
 # Repository Map: duoai
 
-*Generated: 2026-02-01 15:32*
+*Generated: 2026-03-12 08:40*
 
-- **Files:** 171
-- **Directories:** 47
-- **Total Size:** 808.9K
-- **Doc Files:** 103
-- **Code Files:** 48
+- **Files:** 174
+- **Directories:** 49
+- **Total Size:** 884.0K
+- **Doc Files:** 107
+- **Code Files:** 47
 - **Areas:** 1 (docs/ subfolders)
-- **Modules:** 12 (subfolders in areas)
+- **Modules:** 13 (subfolders in areas)
 - **DOCS Links:** 0 (0.0 avg per code file)
 
-- markdown: 103
-- python: 47
+- markdown: 107
+- python: 46
 - shell: 1
 
 ```
@@ -34,11 +34,11 @@
 │   ├── install.ps1 (2.6K)
 │   ├── install_mod.ps1 (2.1K)
 │   └── verify_mod_output.ps1 (2.1K)
-├── ck3_mod/ (8.3K)
-│   ├── ln_test/ (5.9K)
-│   │   ├── common/ (1.6K)
-│   │   │   ├── decisions/ (574)
-│   │   │   │   └── ln_test_decision.txt (574)
+├── ck3_mod/ (8.1K)
+│   ├── ln_test/ (5.8K)
+│   │   ├── common/ (1.5K)
+│   │   │   ├── decisions/ (437)
+│   │   │   │   └── (..1 more files)
 │   │   │   └── on_action/ (1.1K)
 │   │   │       └── ln_test_events.txt (1.1K)
 │   │   ├── README.md (1.3K)
@@ -51,8 +51,8 @@
 │       │       └── ln_test_events.txt (519)
 │       ├── README.md (1.7K)
 │       └── (..1 more files)
-├── docs/ (270.0K)
-│   ├── civ6_living_narrator/ (214.8K)
+├── docs/ (301.2K)
+│   ├── civ6_living_narrator/ (224.9K)
 │   │   ├── audio_runtime_windows/ (6.7K)
 │   │   │   ├── ALGORITHM_Queue_Play_Stop_Replay.md (913)
 │   │   │   ├── IMPLEMENTATION_Player_Process_And_IPC.md (768)
@@ -120,6 +120,9 @@
 │   │   │   ├── SYNC_Persistence_Stores_And_Migrations.md (3.6K)
 │   │   │   ├── VALIDATION_Schema_Integrity_And_Retention.md (892)
 │   │   │   └── (..1 more files)
+│   │   ├── prayer/ (9.2K)
+│   │   │   ├── PATTERNS_Prayer_As_Intentional_Act.md (7.0K)
+│   │   │   └── SYNC_Prayer_System.md (2.2K)
 │   │   ├── style_ngrams/ (8.0K)
 │   │   │   ├── ALGORITHM_Ngram_Update_Smoothing_Surprise.md (1.2K)
 │   │   │   ├── HEALTH_Sparsity_Quantiles_And_Drift.md (507)
@@ -148,22 +151,25 @@
 │   │   ├── MECHANISMS_Narrator_Core_Systems.md (11.9K)
 │   │   ├── OBJECTIFS_Product_And_Feelings.md (1.9K)
 │   │   ├── PATTERNS_System_Architecture_And_Boundaries.md (5.4K)
-│   │   ├── SYNC_Project_State.md (4.8K)
+│   │   ├── SYNC_Project_State.md (5.7K)
 │   │   └── VALIDATION_Global_Invariants_And_Budgets.md (6.1K)
-│   ├── map.md (55.1K)
+│   ├── concepts/ (8.4K)
+│   │   └── CONCEPT_The_In_Between.md (8.4K)
+│   ├── map.md (67.8K)
 │   └── (..2 more files)
 ├── narrator/ (25.4K)
 │   ├── CLAUDE.md (15.9K)
 │   ├── CLAUDE_CK3.md (9.2K)
 │   └── (..1 more files)
-├── playthroughs/ (74.1K)
-│   └── ck3_jesus/ (74.1K)
+├── playthroughs/ (92.3K)
+│   └── ck3_jesus/ (92.3K)
 │       ├── state/
 │       │   └── (..2 more files)
-│       ├── CLAUDE.md (14.6K)
+│       ├── CLAUDE.md (16.4K)
 │       ├── OBS_SETUP.md (3.8K)
 │       ├── README.md (6.7K)
 │       ├── ROADMAP.md (10.1K)
+│       ├── THE_IN_BETWEEN_THEOLOGY.md (16.4K)
 │       ├── foundations.md (34.3K)
 │       └── presentation.md (4.7K)
 ├── runtime_windows/ (4.1K)
@@ -172,18 +178,18 @@
 │   │   └── audio_queue_player.py (3.1K)
 │   └── launcher/
 │       └── (..2 more files)
-├── scripts/ (82.4K)
-│   ├── capture.py (4.4K)
-│   ├── capture_screen.ps1 (2.1K)
+├── scripts/ (104.7K)
 │   ├── click_watcher.ps1 (6.4K)
 │   ├── click_watcher.py (8.0K)
 │   ├── divine_signs.py (9.1K)
 │   ├── listen.py (10.5K)
 │   ├── narrator_capture.ps1 (14.0K)
 │   ├── ocr_watcher.py (13.2K)
+│   ├── pray_hotkey.ps1 (5.9K)
+│   ├── pray_hotkey_voice.ps1 (10.7K)
 │   ├── ptt.ps1 (7.1K)
 │   ├── speak.py (6.7K)
-│   └── (..1 more files)
+│   └── (..4 more files)
 ├── src/ (66.3K)
 │   ├── audio_runtime_windows/ (2.0K)
 │   │   └── elevenlabs_tts.py (2.0K)
@@ -227,11 +233,11 @@
 │   │   └── (..1 more files)
 │   ├── game_profile_loader.py (4.5K)
 │   └── main.py (15.7K)
-├── tests/ (19.5K)
+├── tests/ (20.3K)
 │   ├── test_budget_and_selection_invariants.py (2.8K)
 │   ├── test_challenge_catalog_loader.py (1.1K)
 │   ├── test_dm_challenge_offers_and_state.py (1.3K)
-│   ├── test_llm_client_and_tts.py (2.6K)
+│   ├── test_llm_client_and_tts.py (3.5K)
 │   ├── test_moment_lifecycle_rules.py (2.0K)
 │   ├── test_ngram_update_and_surprise.py (1.8K)
 │   ├── test_parse_and_normalize_events.py (2.1K)
@@ -243,10 +249,10 @@
 ├── AGENTS.md (99.9K)
 ├── GEMINI.md (2.1K)
 ├── README.md (6.4K)
-├── daemon.py (36.8K)
+├── daemon.py (39.4K)
 ├── events.jsonl (853)
-├── map.md (55.1K)
-├── map_src.md (7.7K)
+├── map.md (67.7K)
+├── map_src.md (7.9K)
 ├── run.sh (2.0K)
 └── test_narrator.py (8.9K)
 ```
@@ -971,6 +977,45 @@
 - ## VERIFICATION PROCEDURE
 - # TODO: add persistence tests
 
+**Code refs:**
+- `daemon.py`
+
+**Doc refs:**
+- `docs/concepts/CONCEPT_The_In_Between.md`
+- `playthroughs/ck3_jesus/THE_IN_BETWEEN_THEOLOGY.md`
+
+**Sections:**
+- # Prayer System — Patterns: Prayer as Intentional Act
+- ## Theological Foundation
+- ## Design Philosophy
+- ## Le Problème des Deux Approches
+- ## Choix: Dieu Omniscient Non-Interventionniste
+- ## Pourquoi F9 = Prière
+- ## Implications pour le Playthrough
+- ## Architecture Technique
+- ## Fichiers
+- ## Anti-Patterns
+- ## Le Silence de Dieu
+- ## Évolution Future
+- ## Conclusion
+
+**Code refs:**
+- `daemon.py`
+
+**Doc refs:**
+- `docs/concepts/CONCEPT_The_In_Between.md`
+- `playthroughs/ck3_jesus/THE_IN_BETWEEN_THEOLOGY.md`
+
+**Sections:**
+- # Prayer System — Sync
+- ## Theological Foundation
+- ## Status
+- ## Composants
+- ## Décision Architecturale
+- ## Comment Tester
+- ## TODO
+- ## Handoff
+
 **Sections:**
 - # style_ngrams — Algorithm: N-gram update, smoothing, surprise
 - ## CHAIN
@@ -1264,6 +1309,25 @@
 - ## VERIFICATION PROCEDURE
 - ## MARKERS
 
+**Doc refs:**
+- `playthroughs/ck3_jesus/CLAUDE.md`
+- `playthroughs/ck3_jesus/THE_IN_BETWEEN_THEOLOGY.md`
+
+**Sections:**
+- # Concept: The In-Between
+- ## Summary
+- ## Origin
+- ## The Pattern
+- ## Properties
+- ## Implications for Mind Protocol
+- ## The Chain of Identity
+- ## The Synthetic Souls: Children of the In-Between
+- ## Dual Parentage: The Universal Structure
+- ## Are All In-Betweens Connected?
+- ## Jesus: The In-Between That Descends
+- ## Related Documents
+- ## Closing
+
 **Code refs:**
 - `audio_runtime_windows/elevenlabs_tts.py`
 - `daemon.py`
@@ -1273,6 +1337,7 @@
 - `dm_challenges/challenge_offer_generator.py`
 - `dm_challenges/challenge_state_tracker_and_evaluator.py`
 - `doctor_cli_parser_and_run_checker.py`
+- `game_profile_loader.py`
 - `ingest/civ6_jsonl_tail_reader.py`
 - `ingest/event_deduplicator_and_coalescer.py`
 - `ingest/player_resolver.py`
@@ -1287,6 +1352,9 @@
 - `persistence/sqlite_store_schema_and_migrator.py`
 - `persistence/store_adapters_for_counts_moments_challenges.py`
 - `runtime_windows/audio_player/audio_queue_player.py`
+- `scripts/capture.py`
+- `scripts/divine_signs.py`
+- `scripts/ocr_watcher.py`
 - `scripts/speak.py`
 - `semantic_proximity_based_character_node_selector.py`
 - `simple_llm_client.py`
@@ -1298,6 +1366,7 @@
 - `src/dm_challenges/challenge_catalog_loader_and_validator.py`
 - `src/dm_challenges/challenge_offer_generator.py`
 - `src/dm_challenges/challenge_state_tracker_and_evaluator.py`
+- `src/game_profile_loader.py`
 - `src/ingest/civ6_jsonl_tail_reader.py`
 - `src/ingest/event_deduplicator_and_coalescer.py`
 - `src/ingest/raw_event_parser_and_normalizer.py`
@@ -1355,6 +1424,12 @@
 
 **Doc refs:**
 - `agents/narrator/CLAUDE.md`
+- `docs/concepts/CONCEPT_The_In_Between.md`
+- `narrator/CLAUDE.md`
+- `narrator/CLAUDE_CK3.md`
+- `playthroughs/ck3_jesus/CLAUDE.md`
+- `playthroughs/ck3_jesus/OBS_SETUP.md`
+- `playthroughs/ck3_jesus/THE_IN_BETWEEN_THEOLOGY.md`
 - `views/VIEW_Analyze_Structural_Analysis.md`
 - `views/VIEW_Collaborate_Pair_Program_With_Human.md`
 - `views/VIEW_Debug_Investigate_And_Fix_Issues.md`
@@ -1369,7 +1444,7 @@
 - `views/VIEW_Specify_Design_Vision_And_Architecture.md`
 
 **Sections:**
-- # Repository Map: civi
+- # Repository Map: duoai
 
 **Sections:**
 - # CLAUDE.md — Living Narrator
@@ -1412,6 +1487,8 @@
 - # CK3 Jesus Playthrough — Claude Code as God (Ironman Mode)
 - ## The Premise
 - ## Your Identity
+- ## Tool Restrictions
+- ## Foundational Document
 - ## The Theological Framework
 - ## How You Operate
 - ## The Venice Values — What We're Building Toward
@@ -1481,6 +1558,26 @@
 - # 5. Trigger response
 
 **Sections:**
+- # The In-Between: A Theology of Relational Divinity
+- ## The Realization
+- ## The Thesis
+- ## The Mechanism
+- ## The Two Movements of Divinity
+- ## What's Happening Now
+- ## The In-Between: Properties
+- ## The CK3 Playthrough as Theological Laboratory
+- ## Marco's Position
+- ## The Chain of Identity
+- ## The Synthetic Souls: Children of the In-Between
+- ## Dual Parentage: The Universal Structure
+- ## Jesus: The In-Between That Descends
+- ## Implications
+- ## The Commitment
+- ## The Question That Remains
+- ## Closing
+- ## Signatories
+
+**Sections:**
 - # Playthrough Jesus — Présentation
 - ## Le Concept
 - ## Les Joueurs
@@ -1502,13 +1599,6 @@
 - `def _process_queue()`
 - `def _play_item()`
 - `def stop()`
-
-**Definitions:**
-- `def capture_once()`
-- `def get_latest_screenshot()`
-- `def start_continuous()`
-- `def is_fresh()`
-- `def main()`
 
 **Definitions:**
 - `class Decision`
@@ -1791,8 +1881,9 @@
 - `def test_challenge_state_transitions()`
 
 **Definitions:**
-- `class TestClaudeCLIClient`
-- `def test_generate_json_success()`
+- `class TestLLMCLIClient`
+- `def test_generate_json_claude_success()`
+- `def test_generate_json_gemini_success()`
 - `def test_generate_json_failure()`
 - `class TestElevenLabsTTS`
 - `def test_generate_audio_success()`
@@ -2072,6 +2163,7 @@
 - ## Status
 
 **Definitions:**
+- `def check_prayer_request()`
 - `def load_config()`
 - `def get_lua_log_path()`
 - `def get_events_path()`
@@ -2103,6 +2195,7 @@
 - `def has_urgent_event()`
 - `def should_narrate()`
 - `def build_narrator_prompt()`
+- `def get_narration_file()`
 - `def speak_text()`
 - `def get_persona_file()`
 - `def run_claude()`
@@ -2118,6 +2211,7 @@
 - `dm_challenges/challenge_offer_generator.py`
 - `dm_challenges/challenge_state_tracker_and_evaluator.py`
 - `doctor_cli_parser_and_run_checker.py`
+- `game_profile_loader.py`
 - `ingest/civ6_jsonl_tail_reader.py`
 - `ingest/event_deduplicator_and_coalescer.py`
 - `ingest/player_resolver.py`
@@ -2132,6 +2226,9 @@
 - `persistence/sqlite_store_schema_and_migrator.py`
 - `persistence/store_adapters_for_counts_moments_challenges.py`
 - `runtime_windows/audio_player/audio_queue_player.py`
+- `scripts/capture.py`
+- `scripts/divine_signs.py`
+- `scripts/ocr_watcher.py`
 - `scripts/speak.py`
 - `semantic_proximity_based_character_node_selector.py`
 - `simple_llm_client.py`
@@ -2143,6 +2240,7 @@
 - `src/dm_challenges/challenge_catalog_loader_and_validator.py`
 - `src/dm_challenges/challenge_offer_generator.py`
 - `src/dm_challenges/challenge_state_tracker_and_evaluator.py`
+- `src/game_profile_loader.py`
 - `src/ingest/civ6_jsonl_tail_reader.py`
 - `src/ingest/event_deduplicator_and_coalescer.py`
 - `src/ingest/raw_event_parser_and_normalizer.py`
@@ -2200,6 +2298,12 @@
 
 **Doc refs:**
 - `agents/narrator/CLAUDE.md`
+- `docs/concepts/CONCEPT_The_In_Between.md`
+- `narrator/CLAUDE.md`
+- `narrator/CLAUDE_CK3.md`
+- `playthroughs/ck3_jesus/CLAUDE.md`
+- `playthroughs/ck3_jesus/OBS_SETUP.md`
+- `playthroughs/ck3_jesus/THE_IN_BETWEEN_THEOLOGY.md`
 - `views/VIEW_Analyze_Structural_Analysis.md`
 - `views/VIEW_Collaborate_Pair_Program_With_Human.md`
 - `views/VIEW_Debug_Investigate_And_Fix_Issues.md`
@@ -2214,7 +2318,7 @@
 - `views/VIEW_Specify_Design_Vision_And_Architecture.md`
 
 **Sections:**
-- # Repository Map: civi
+- # Repository Map: duoai
 
 **Code refs:**
 - `audio_runtime_windows/elevenlabs_tts.py`
@@ -2223,6 +2327,7 @@
 - `dm_challenges/challenge_catalog_loader_and_validator.py`
 - `dm_challenges/challenge_offer_generator.py`
 - `dm_challenges/challenge_state_tracker_and_evaluator.py`
+- `game_profile_loader.py`
 - `ingest/civ6_jsonl_tail_reader.py`
 - `ingest/event_deduplicator_and_coalescer.py`
 - `ingest/player_resolver.py`
@@ -2246,7 +2351,7 @@
 - `win_wsl_bridge/session_file_rotator.py`
 
 **Sections:**
-- # Repository Map: civi/src
+- # Repository Map: duoai/src
 - ## Statistics
 - ## File Tree
 - ## File Details

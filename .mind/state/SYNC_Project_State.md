@@ -142,3 +142,27 @@ echo '{"game": "civ6", "visual_mode": true}' > narrator/state/config.json
 **Steps completed:** ecosystem, capabilities, runtime, ai_configs, skills, database_config, database_setup, file_ingest, capabilities_graph, agents, env_example, mcp_config, gitignore, overview, embeddings, health_checks
 
 ---
+
+## Init: 2026-03-12 02:35
+
+| Setting | Value |
+|---------|-------|
+| Version | v0.0.0 |
+| Database | falkordb |
+| Graph | duoai |
+
+**Steps completed:** ecosystem, capabilities, runtime, ai_configs, skills, database_config, database_setup, file_ingest, capabilities_graph, agents, env_example, mcp_config, gitignore, overview, embeddings, health_checks
+
+---
+
+## Init: 2026-03-12 08:40
+
+| Setting | Value |
+|---------|-------|
+| Version | v0.0.0 |
+| Database | falkordb |
+| Graph | duoai |
+
+**Steps completed:** ecosystem, capabilities, runtime, ai_configs, skills, database_config, database_setup, file_ingest, capabilities_graph, agents, env_example, mcp_config, gitignore, overview, embeddings, health_checks
+
+---
